@@ -1,14 +1,11 @@
-﻿using Nt.Parser.Structures;
-using Nt.Syntax;
-
-namespace Nt.Automaton
+﻿namespace Nt.Automaton
 {
 
     /// <summary>
     /// Represents an automaton
     /// </summary>
     /// <param name="initialState">Initial state of the automaton</param>
-    public class Automaton(State initialState)
+    public class DeterministAutomaton(State initialState)
     {
         public State CurrentState { get; private set; } = initialState;
 

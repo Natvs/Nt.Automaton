@@ -1,7 +1,6 @@
-﻿using Nt.Automaton;
-using Nt.Automaton.Exceptions;
+﻿using Nt.Automaton.Exceptions;
 
-namespace Nt.Syntax
+namespace Nt.Automaton
 {
     public class State
     {
