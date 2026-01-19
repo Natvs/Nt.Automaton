@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Nt.Automaton.Application/Nt.Automaton.Application.csproj" />
+  <Project Path="Nt.Automaton.Domain/Nt.Automaton.Domain.csproj" />
+</Solution>
