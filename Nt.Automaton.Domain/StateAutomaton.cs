@@ -1,13 +1,16 @@
-﻿namespace Nt.Automaton
+﻿using Nt.Automaton.States;
+using Nt.Automaton.Tokens;
+
+namespace Nt.Automaton
 {
 
     /// <summary>
     /// Represents an automaton
     /// </summary>
     /// <param name="initialState">Initial state of the automaton</param>
-    public class DeterministAutomaton(State initialState)
+    public class StateAutomaton(State initialState) : IAutomaton
     {
-        public State CurrentState { get; private set; } = initialState;
+        public IState CurrentState { get; private set; } = initialState;
 
         /// <summary>
         /// Reads a token from the current state and updates current state to the next state
@@ -19,4 +22,5 @@
             CurrentState = CurrentState.Read(token);
         }
     }
+
 }

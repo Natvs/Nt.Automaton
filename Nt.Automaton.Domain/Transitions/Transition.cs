@@ -1,12 +1,16 @@
-﻿namespace Nt.Automaton
+﻿using Nt.Automaton.Actions;
+using Nt.Automaton.States;
+
+namespace Nt.Automaton.Transitions
 {
+
     /// <summary>
     /// Represents a transition in an automaton from a state to an other state
     /// </summary>
-    public class Transition
+    public class Transition : ITransition
     {
         public string Value { get; }
-        public State NewState { get; }
+        public IState NewState { get; }
         public IAction? Action { get; }
 
         /// <summary>
@@ -14,7 +18,7 @@
         /// </summary>
         /// <param name="value">The value that triggers the transition.</param>
         /// <param name="newState">The state to which the transition leads when the specified value is read.</param>
-        public Transition(string value, State newState)
+        public Transition(string value, IState newState)
         {
             Value = value;
             NewState = newState;
@@ -26,11 +30,12 @@
         /// <param name="value">The value that triggers the transition.</param>
         /// <param name="newState">The state to which the transition leads when the specified value is read.</param>
         /// <param name="action">The action to perform when this transition is taken</param>
-        public Transition(string value, State newState, IAction action)
+        public Transition(string value, IState newState, IAction action)
         {
             Value = value;
             NewState = newState;
             Action = action;
         }
     }
+
 }

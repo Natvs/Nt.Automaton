@@ -1,4 +1,4 @@
-﻿namespace Nt.Automaton
+﻿namespace Nt.Automaton.Tokens
 {
     public interface IAutomatonToken
     {

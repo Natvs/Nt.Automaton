@@ -1,4 +1,6 @@
-﻿namespace Nt.Automaton
+﻿using Nt.Automaton.Tokens;
+
+namespace Nt.Automaton.Actions
 {
     public interface IAction 
     {

@@ -1,4 +1,4 @@
-﻿namespace Nt.Automaton.Exceptions
+﻿namespace Nt.Automaton.States.Exceptions
 {
     public class NoDefaultStateException : Exception
     {

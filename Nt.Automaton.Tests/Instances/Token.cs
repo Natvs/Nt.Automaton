@@ -1,4 +1,4 @@
-﻿using Nt.Automaton;
+﻿using Nt.Automaton.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Text;
