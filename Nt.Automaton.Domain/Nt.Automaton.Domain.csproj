@@ -1,10 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 	<RootNamespace>Nt.Automaton</RootNamespace>
+	<Title>Nt.Automaton</Title>
+	<Description>Automaton with states that can trigger actions</Description>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
+	<RepositoryUrl>https://github.com/Natvs/Nt.Automaton</RepositoryUrl>
+	<RepositoryType>git</RepositoryType>
+	<PackageTags>automate ; automaton ; states</PackageTags>
+	<PackageReleaseNotes>First official release</PackageReleaseNotes>
+	<PackageVersion>1.0.0</PackageVersion>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
 </Project>

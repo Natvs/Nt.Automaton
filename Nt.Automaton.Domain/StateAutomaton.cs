@@ -10,6 +10,7 @@ namespace Nt.Automaton
     /// <param name="initialState">Initial state of the automaton</param>
     public class StateAutomaton(State initialState) : IAutomaton
     {
+        public IState InitialState { get; } = initialState;
         public IState CurrentState { get; private set; } = initialState;
 
         /// <summary>
