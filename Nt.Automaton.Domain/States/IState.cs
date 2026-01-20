@@ -3,9 +3,9 @@ using Nt.Automaton.Tokens;
 
 namespace Nt.Automaton.States
 {
-    public interface IState
+    public interface IState<T>
     {
-        IAction? Action { get; }
-        IState Read(IAutomatonToken token);
+        IAction<T>? Action { get; }
+        IState<T> Read(IAutomatonToken<T> token);
     }
 }

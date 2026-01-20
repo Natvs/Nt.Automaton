@@ -7,18 +7,18 @@ namespace Nt.Automaton.Transitions
     /// <summary>
     /// Represents a transition in an automaton from a state to an other state
     /// </summary>
-    public class Transition : ITransition
+    public class Transition<T> : ITransition<T>
     {
-        public string Value { get; }
-        public IState NewState { get; }
-        public IAction? Action { get; }
+        public T Value { get; }
+        public IState<T> NewState { get; }
+        public IAction<T>? Action { get; }
 
         /// <summary>
         /// Initializes a new transition with the specified transition value and target state.
         /// </summary>
         /// <param name="value">The value that triggers the transition.</param>
         /// <param name="newState">The state to which the transition leads when the specified value is read.</param>
-        public Transition(string value, IState newState)
+        public Transition(T value, IState<T> newState)
         {
             Value = value;
             NewState = newState;
@@ -30,7 +30,7 @@ namespace Nt.Automaton.Transitions
         /// <param name="value">The value that triggers the transition.</param>
         /// <param name="newState">The state to which the transition leads when the specified value is read.</param>
         /// <param name="action">The action to perform when this transition is taken</param>
-        public Transition(string value, IState newState, IAction action)
+        public Transition(T value, IState<T> newState, IAction<T> action)
         {
             Value = value;
             NewState = newState;

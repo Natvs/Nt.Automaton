@@ -2,8 +2,8 @@
 
 namespace Nt.Automaton
 {
-    public interface IAutomaton
+    public interface IAutomaton<T>
     {
-        void Read(IAutomatonToken token);
+        void Read(IAutomatonToken<T> token);
     }
 }

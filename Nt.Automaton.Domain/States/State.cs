@@ -9,12 +9,12 @@ namespace Nt.Automaton.States
     /// <summary>
     /// Represents a state within a finite state machine, including its transitions, actions, and default behavior.
     /// </summary>
-    public class State : IState
+    public class State<T> : IState<T>
     {
-        public List<ITransition> Transitions { get; } = [];
-        public IState? DefaultState { get; private set; }
-        public IAction? DefaulAction { get; private set; }
-        public IAction? Action { get; }
+        public List<ITransition<T>> Transitions { get; } = [];
+        public IState<T>? DefaultState { get; private set; }
+        public IAction<T>? DefaulAction { get; private set; }
+        public IAction<T>? Action { get; }
 
         /// <summary>
         /// Initializes a new instance of the State class.
@@ -24,7 +24,7 @@ namespace Nt.Automaton.States
         /// Initializes a new instance of the State class with the specified action.
         /// </summary>
         /// <param name="action">The action to associate with this state.</param>
-        public State(IAction action)
+        public State(IAction<T> action)
         {
             Action = action;
         }
@@ -34,7 +34,7 @@ namespace Nt.Automaton.States
         /// </summary>
         /// <param name="defaultState">The state to use as the default.</param>
         /// <returns>The current instance with the default state set.</returns>
-        public State SetDefault(IState defaultState)
+        public State<T> SetDefault(IState<T> defaultState)
         {
             DefaultState = defaultState;
             return this;
@@ -45,7 +45,7 @@ namespace Nt.Automaton.States
         /// <param name="defaultState">The state to use as the default.</param>
         /// <param name="defaultAction">The action to use as the default.</param>
         /// <returns>The current instance with the updated default state and action.</returns>
-        public State SetDefault(IState defaultState, IAction defaultAction)
+        public State<T> SetDefault(IState<T> defaultState, IAction<T> defaultAction)
         {
             DefaultState = defaultState;
             DefaulAction = defaultAction;
@@ -56,7 +56,7 @@ namespace Nt.Automaton.States
         /// Adds a transition from this state to an other one.
         /// </summary>
         /// <param name="transition">The transition to add.</param>
-        public void AddTransition(ITransition transition)
+        public void AddTransition(ITransition<T> transition)
         {
             Transitions.Add(transition);
         }
@@ -64,9 +64,9 @@ namespace Nt.Automaton.States
         /// Replaces any existing transition with the same value by the new transition.
         /// </summary>
         /// <param name="transition">The transition to add or overwrite in the collection.</param>
-        public void OverwriteTransition(ITransition transition)
+        public void OverwriteTransition(ITransition<T> transition)
         {
-            List<ITransition> toRemove = [];
+            List<ITransition<T>> toRemove = [];
             foreach (var t in Transitions)
             {
                 if (t.Value.Equals(transition.Value)) toRemove.Add(t);
@@ -81,7 +81,7 @@ namespace Nt.Automaton.States
         /// Adds a collection of transitions, from this state to other states.
         /// </summary>
         /// <param name="transitions">A list of transitions to add.</param>
-        public void AddTransitions(ICollection<ITransition> transitions)
+        public void AddTransitions(ICollection<ITransition<T>> transitions)
         {
             foreach (var transition in transitions)
             {
@@ -96,12 +96,13 @@ namespace Nt.Automaton.States
         /// <returns>Next state of the automaton after reading the token</returns>
         /// <remarks>In case of multiple transitions with same symbol, only the first action added will be performed</remarks>
         /// <exception cref="NoDefaultStateException">It might be that no default state was set for this state</exception>
-        public IState Read(IAutomatonToken token)
+        public IState<T> Read(IAutomatonToken<T> token)
         {
             if (DefaultState == null) throw new NoDefaultStateException();
-            foreach (ITransition transition in Transitions)
+            foreach (var transition in Transitions)
             {
-                if (transition.Value.Equals(token.Name))
+                if (transition.Value == null) throw new NullTransitionTokenValue();
+                if (transition.Value.Equals(token.Value))
                 {
                     transition.Action?.Perform(token);
                     transition.NewState.Action?.Perform(token);

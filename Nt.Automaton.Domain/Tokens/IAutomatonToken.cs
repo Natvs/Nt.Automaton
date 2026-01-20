@@ -1,7 +1,7 @@
 ﻿namespace Nt.Automaton.Tokens
 {
-    public interface IAutomatonToken
+    public interface IAutomatonToken<T>
     {
-        string Name { get; }
+        T Value { get; }
     }
 }

@@ -3,10 +3,10 @@ using Nt.Automaton.States;
 
 namespace Nt.Automaton.Transitions
 {
-    public interface ITransition
+    public interface ITransition<T>
     {
-        string Value { get; }
-        IState NewState { get; }
-        IAction? Action { get; }
+        T Value { get; }
+        IState<T> NewState { get; }
+        IAction<T>? Action { get; }
     }
 }

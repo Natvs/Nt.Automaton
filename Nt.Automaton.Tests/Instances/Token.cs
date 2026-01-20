@@ -5,8 +5,8 @@ using System.Text;
 
 namespace Nt.Tests.Automaton.Instances
 {
-    internal class Token(string name) : IAutomatonToken
+    internal class Token(string name) : IAutomatonToken<string>
     {
-        public string Name { get; private set; } = name;
+        public string Value { get; private set; } = name;
     }
 }

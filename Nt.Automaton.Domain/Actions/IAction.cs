@@ -2,9 +2,9 @@
 
 namespace Nt.Automaton.Actions
 {
-    public interface IAction 
+    public interface IAction<T> 
     {
-        void Perform(IAutomatonToken token);
+        void Perform(IAutomatonToken<T> token);
     }
 
 }

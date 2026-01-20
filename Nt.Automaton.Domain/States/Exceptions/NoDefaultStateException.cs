@@ -1,7 +1,7 @@
 ﻿namespace Nt.Automaton.States.Exceptions
 {
-    public class NoDefaultStateException : Exception
+    public class NoDefaultStateException() : Exception("Default state is not defined")
     {
-        public NoDefaultStateException() : base("Default state is not defined") { }
+
     }
 }
