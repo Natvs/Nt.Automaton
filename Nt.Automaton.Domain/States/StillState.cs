@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Nt.Automaton.States
 {
-    internal class StillState<T> : IState<T>
+    public class StillState<T> : IState<T>
     {
         public List<ITransition<T>> Transitions { get; } = [];
         public IState<T>? DefaultState { get; private set; }
