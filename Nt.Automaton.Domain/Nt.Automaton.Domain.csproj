@@ -12,6 +12,7 @@
 	<PackageTags>automate ; automaton ; states</PackageTags>
 	<PackageReleaseNotes>First official release</PackageReleaseNotes>
 	<PackageVersion>1.0.0</PackageVersion>
+	<PackageId>Nt.Automaton</PackageId>
   </PropertyGroup>
 
   <ItemGroup>

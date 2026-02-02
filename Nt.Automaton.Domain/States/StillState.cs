@@ -2,14 +2,13 @@
 using Nt.Automaton.States.Exceptions;
 using Nt.Automaton.Tokens;
 using Nt.Automaton.Transitions;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace Nt.Automaton.States
 {
-
-    /// <summary>
-    /// Represents a state within a finite state machine, including its transitions, actions, and default behavior.
-    /// </summary>
-    public class State<T> : IState<T>
+    internal class StillState<T> : IState<T>
     {
         public List<ITransition<T>> Transitions { get; } = [];
         public IState<T>? DefaultState { get; private set; }
@@ -19,12 +18,12 @@ namespace Nt.Automaton.States
         /// <summary>
         /// Initializes a new instance of the State class.
         /// </summary>
-        public State() { }
+        public StillState() { }
         /// <summary>
         /// Initializes a new instance of the State class with the specified action.
         /// </summary>
         /// <param name="action">The action to associate with this state.</param>
-        public State(IAction<T> action)
+        public StillState(IAction<T> action)
         {
             Action = action;
         }
@@ -34,18 +33,18 @@ namespace Nt.Automaton.States
         /// </summary>
         /// <param name="defaultState">The state to use as the default.</param>
         /// <returns>The current instance with the default state set.</returns>
-        public State<T> SetDefault(IState<T> defaultState)
+        public StillState<T> SetDefault(IState<T> defaultState)
         {
             DefaultState = defaultState;
             return this;
-        }     
+        }
         /// <summary>
         /// Sets the default state and action for this instance.
         /// </summary>
         /// <param name="defaultState">The state to use as the default.</param>
         /// <param name="defaultAction">The action to use as the default.</param>
         /// <returns>The current instance with the updated default state and action.</returns>
-        public State<T> SetDefault(IState<T> defaultState, IAction<T> defaultAction)
+        public StillState<T> SetDefault(IState<T> defaultState, IAction<T> defaultAction)
         {
             DefaultState = defaultState;
             DefaulAction = defaultAction;
@@ -105,14 +104,11 @@ namespace Nt.Automaton.States
                 if (transition.Value.Equals(token.Value))
                 {
                     transition.Action?.Perform(token);
-                    transition.NewState.Action?.Perform(token);
                     return transition.NewState;
                 }
             }
             DefaulAction?.Perform(token);
-            DefaultState.Action?.Perform(token);
             return DefaultState;
-        }           
+        }
     }
-
 }
