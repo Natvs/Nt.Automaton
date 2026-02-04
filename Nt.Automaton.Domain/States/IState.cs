@@ -7,8 +7,22 @@ namespace Nt.Automaton.States
     public interface IState<T>
     {
         IAction<T>? Action { get; }
+
         IState<T> Read(IAutomatonToken<T> token);
         void AddTransition(ITransition<T> transition);
-        public void AddTransitions(ICollection<ITransition<T>> transitions);
+
+        /// <summary>
+        /// Triggers the <see cref="StateReached"/> event
+        /// </summary>
+        /// <param name="args">Event arguments</param>
+        void OnReached(StateEventArgs<T> args);
+        /// <summary>
+        /// Triggers the <see cref="StateLeft"/> event
+        /// </summary>
+        /// <param name="args"></param>
+        void OnLeft(StateEventArgs<T> args);
+
+        event EventHandler<StateEventArgs<T>> StateReached;
+        event EventHandler<StateEventArgs<T>> StateLeft;
     }
 }

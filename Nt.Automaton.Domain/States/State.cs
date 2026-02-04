@@ -2,6 +2,7 @@
 using Nt.Automaton.States.Exceptions;
 using Nt.Automaton.Tokens;
 using Nt.Automaton.Transitions;
+using System.Transactions;
 
 namespace Nt.Automaton.States
 {
@@ -103,16 +104,56 @@ namespace Nt.Automaton.States
                 if (transition.Value == null) throw new NullTransitionTokenValue();
                 if (transition.Value.Equals(token.Value))
                 {
-                    transition.Action?.Perform(token);
-                    transition.NewState.Action?.Perform(token);
-                    return transition.NewState;
+                    return TargetNewState(transition, token);
                 }
             }
+            return TargetDefaultState(token);
+        }
+
+        private IState<T> TargetNewState(ITransition<T> transition, IAutomatonToken<T> token)
+        {
+            transition.Action?.Perform(token);
+            transition.NewState.Action?.Perform(token);
+
+            var args = new StateEventArgs<T>(transition);
+            OnLeft(args);
+            transition.NewState.OnReached(args);
+
+            return transition.NewState;
+        }
+
+        private IState<T> TargetDefaultState(IAutomatonToken<T> token)
+        {
             if (DefaultState == null) throw new NoDefaultStateException();
             DefaulAction?.Perform(token);
-            DefaultState.Action?.Perform(token);
-            return DefaultState;
-        }           
+            DefaultState?.Action?.Perform(token);
+
+            var args = new StateEventArgs<T>(new Transition<T>(token.Value, DefaultState!));
+            OnLeft(args);
+            DefaultState!.OnReached(args);
+
+            return DefaultState!;
+        }
+
+        public void OnReached(StateEventArgs<T> args)
+        {
+            StateReached?.Invoke(this, args);
+        }
+
+        public void OnLeft(StateEventArgs<T> args)
+        {
+            StateLeft?.Invoke(this, args);
+        }
+
+        /// <summary>
+        /// Event triggered after a transition that targets this state is taken.
+        /// </summary>
+        public event EventHandler<StateEventArgs<T>> StateReached;
+
+        /// <summary>
+        /// Event triggered before a transition that departs from this state is taken.
+        /// </summary>
+        public event EventHandler<StateEventArgs<T>> StateLeft;
     }
 
 }

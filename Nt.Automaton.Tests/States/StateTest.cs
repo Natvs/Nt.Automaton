@@ -6,6 +6,8 @@ namespace Nt.Tests.Automaton.States
 {
     public class StateTest
     {
+        // Target states
+
         [Fact]
         public void State_DefaultTransition_ValidState()
         {
@@ -33,15 +35,6 @@ namespace Nt.Tests.Automaton.States
         }
 
         [Fact]
-        public void State_DefaultTransition_StateActionPerformed()
-        {
-            var initial = new State<string>(new ThrowStateErrorAction());
-            initial.SetDefault(initial);
-
-            Assert.Throws<StateErrorException>(() => initial.Read(new AutomatonToken<string>("a")));
-        }
-
-        [Fact]
         public void State_Transition_ValidState()
         {
             var initial = new State<string>();
@@ -53,6 +46,17 @@ namespace Nt.Tests.Automaton.States
             Assert.Equal(second, new_state);
         }
 
+        // Actions
+
+        [Fact]
+        public void State_DefaultTransition_StateActionPerformed()
+        {
+            var initial = new State<string>(new ThrowStateErrorAction());
+            initial.SetDefault(initial);
+
+            Assert.Throws<StateErrorException>(() => initial.Read(new AutomatonToken<string>("a")));
+        }
+
         [Fact]
         public void State_Transition_StateActionPerformed()
         {
@@ -61,6 +65,62 @@ namespace Nt.Tests.Automaton.States
             initial.AddTransition(new Transition<string>("a", second));
 
             Assert.Throws<StateErrorException>(() => initial.Read(new AutomatonToken<string>("a")));
+        }
+
+        // Events
+
+        [Fact]
+        public void State_DefaultTransition_LeftEventTriggered()
+        {
+            var initial = new State<string>();
+            bool left_triggered = false;
+            initial.SetDefault(initial);
+            initial.StateLeft += (state, token) => { left_triggered = true; };
+
+            initial.Read(new AutomatonToken<string>("a"));
+
+            Assert.True(left_triggered);
+        }
+
+        [Fact]
+        public void State_DefaultTransition_ReachedEventTriggered()
+        {
+            var initial = new State<string>();
+            bool reached_triggered = false;
+            initial.SetDefault(initial);
+            initial.StateReached += (state, token) => { reached_triggered = true; };
+
+            initial.Read(new AutomatonToken<string>("a"));
+
+            Assert.True(reached_triggered);
+        }
+
+        [Fact]
+        public void State_Transition_LeftEventTriggered()
+        {
+            var initial = new State<string>();
+            var second = new State<string>();
+            bool left_triggered = false;
+            initial.AddTransition(new Transition<string>("a", second));
+            initial.StateLeft += (state, token) => { left_triggered = true; };
+
+            initial.Read(new AutomatonToken<string>("a"));
+
+            Assert.True(left_triggered);
+        }
+
+        [Fact]
+        public void State_Transition_ReachedEventTriggered()
+        {
+            var initial = new State<string>();
+            var second = new State<string>();
+            bool reached_triggered = false;
+            initial.AddTransition(new Transition<string>("a", second));
+            second.StateReached += (state, token) => { reached_triggered = true; };
+
+            initial.Read(new AutomatonToken<string>("a"));
+
+            Assert.True(reached_triggered);
         }
     }
 }
