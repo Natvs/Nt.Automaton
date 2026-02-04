@@ -98,7 +98,6 @@ namespace Nt.Automaton.States
         /// <exception cref="NoDefaultStateException">It might be that no default state was set for this state</exception>
         public IState<T> Read(IAutomatonToken<T> token)
         {
-            if (DefaultState == null) throw new NoDefaultStateException();
             foreach (var transition in Transitions)
             {
                 if (transition.Value == null) throw new NullTransitionTokenValue();
@@ -109,6 +108,7 @@ namespace Nt.Automaton.States
                     return transition.NewState;
                 }
             }
+            if (DefaultState == null) throw new NoDefaultStateException();
             DefaulAction?.Perform(token);
             DefaultState.Action?.Perform(token);
             return DefaultState;
