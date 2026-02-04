@@ -1,4 +1,4 @@
-﻿using Nt.Automaton;
+﻿using Nt.Automaton.Automatons;
 using Nt.Automaton.States;
 using Nt.Automaton.Transitions;
 using Nt.Tests.Automaton.Instances;

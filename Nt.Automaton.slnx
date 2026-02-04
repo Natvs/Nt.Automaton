@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Doc/">
+    <File Path="Doc/States.md" />
+  </Folder>
   <Folder Name="/Solution files/">
     <File Path=".gitattributes" />
     <File Path=".gitignore" />

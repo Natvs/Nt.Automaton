@@ -22,7 +22,7 @@ namespace Nt.Automaton.States
         /// <param name="args"></param>
         void OnLeft(StateEventArgs<T> args);
 
-        event EventHandler<StateEventArgs<T>> StateReached;
-        event EventHandler<StateEventArgs<T>> StateLeft;
+        event EventHandler<StateEventArgs<T>>? StateReached;
+        event EventHandler<StateEventArgs<T>>? StateLeft;
     }
 }

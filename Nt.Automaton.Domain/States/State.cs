@@ -112,25 +112,31 @@ namespace Nt.Automaton.States
 
         private IState<T> TargetNewState(ITransition<T> transition, IAutomatonToken<T> token)
         {
-            transition.Action?.Perform(token);
-            transition.NewState.Action?.Perform(token);
-
             var args = new StateEventArgs<T>(transition);
-            OnLeft(args);
-            transition.NewState.OnReached(args);
 
-            return transition.NewState;
+            // Leaves the current state then performs the transition action
+            OnLeft(args);
+            transition.Action?.Perform(token);
+
+            // Enters the new state and performs its action
+            transition.Target.OnReached(args);
+            transition.Target.Action?.Perform(token);
+
+            return transition.Target;
         }
 
         private IState<T> TargetDefaultState(IAutomatonToken<T> token)
         {
             if (DefaultState == null) throw new NoDefaultStateException();
-            DefaulAction?.Perform(token);
-            DefaultState?.Action?.Perform(token);
-
             var args = new StateEventArgs<T>(new Transition<T>(token.Value, DefaultState!));
+
+            // Leaves the current state then performs the transition action
             OnLeft(args);
+            DefaulAction?.Perform(token);
+
+            // Enters the default state and performs its action
             DefaultState!.OnReached(args);
+            DefaultState?.Action?.Perform(token);
 
             return DefaultState!;
         }
@@ -139,7 +145,6 @@ namespace Nt.Automaton.States
         {
             StateReached?.Invoke(this, args);
         }
-
         public void OnLeft(StateEventArgs<T> args)
         {
             StateLeft?.Invoke(this, args);
@@ -148,12 +153,11 @@ namespace Nt.Automaton.States
         /// <summary>
         /// Event triggered after a transition that targets this state is taken.
         /// </summary>
-        public event EventHandler<StateEventArgs<T>> StateReached;
-
+        public event EventHandler<StateEventArgs<T>>? StateReached;
         /// <summary>
         /// Event triggered before a transition that departs from this state is taken.
         /// </summary>
-        public event EventHandler<StateEventArgs<T>> StateLeft;
+        public event EventHandler<StateEventArgs<T>>? StateLeft;
     }
 
 }

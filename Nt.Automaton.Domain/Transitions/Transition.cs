@@ -10,7 +10,7 @@ namespace Nt.Automaton.Transitions
     public class Transition<T> : ITransition<T>
     {
         public T Value { get; }
-        public IState<T> NewState { get; }
+        public IState<T> Target { get; }
         public IAction<T>? Action { get; }
 
         /// <summary>
@@ -21,7 +21,7 @@ namespace Nt.Automaton.Transitions
         public Transition(T value, IState<T> newState)
         {
             Value = value;
-            NewState = newState;
+            Target = newState;
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace Nt.Automaton.Transitions
         public Transition(T value, IState<T> newState, IAction<T> action)
         {
             Value = value;
-            NewState = newState;
+            Target = newState;
             Action = action;
         }
     }

@@ -137,46 +137,9 @@ The `StateAutomaton` is a common automaton type with always one active state. It
 ---
 
 ### Custom states
-By extending the `IState` interface, it is possible to create other types of states. This interface has a field `IAction Action` that can be null and a method `IState Read(IAutomatonToken token)`.
+By extending the `IState` interface, it is possible to create other types of states. See the [states documentation](Doc/States.md) for more details.
 
-Here is a list of implemented states in this library:
 
-#### State
-
-This kind of state can have only one action, a list of transitions, a default state and a default action. It can only take one transition at a time.
-
-**Fields**
-|Name|Type|Description|
-|----|----|-----------|
-|Action|IAction|The action to be executed when entering this state.|
-|Transitions|List<ITransition>|A list of transitions that can be taken from this state.|
-|DefaultState|IState|The state to transfer to when none of the above transitions are valid.|
-|DefaultAction|IAction|The action to be executed when transferring to the default state.|
-
-**Methods**
-|Name|Parameters|Return Type|Description|
-|----|----------|-----------|-----------|
-|State()| |State|Default constructor of a new instance of State without action.|
-|State(IAction action)|action to execute when entering the state|State|Constructor of a new instance of State with an action.|
-|SetDefault(IState state)|state to return when read if no transitions are valid|State|Set the default state to return when no transitions are valid.|
-|SetDefault(IState state, IAction action)|state and action to perform when read if no transitions are valid|State|Set the default state and actions when no transitions are valid.|
-|AddTransition(ITransition transitions)|transition to add|void|Adds a transition to the list of transitions.|
-|AddTransitions(ICollection<ITransition> transition)|collection of transitions to add|void|Shortcut for adding multiple transitions.|
-|OverwriteTransition(ITransition transition)|transition to overwrite|void|Overwrites an existing transition in the list of transitions.|
-|Read(IAutomatonToken token)|token to read to take a transition|State|Returns the target state of the right transition, or the default one if there is no such transition.|
-
-**Rules for triggering actions**
-
-All actions are performed when the method `Read(token)` is called.
-
-When a transition is taken:
-- If a transition with the token read exists:
-	1. The action `Action` associated to the transition is performed.
-	2. The action `Action` of the target state is triggered.
-	3. The target state is returned
-- If no transitions with the token read exists:
-    1. The default action `DefaultAction` is performed
-	2. The default state is returned
 
 ---
 
