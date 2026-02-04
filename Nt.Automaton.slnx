@@ -1,4 +1,10 @@
 <Solution>
+  <Folder Name="/Solution files/">
+    <File Path=".gitattributes" />
+    <File Path=".gitignore" />
+    <File Path="nuget.config" />
+    <File Path="README.md" />
+  </Folder>
   <Project Path="Nt.Automaton.Domain/Nt.Automaton.Domain.csproj" />
   <Project Path="Nt.Automaton.Tests/Nt.Automaton.Tests.csproj" Id="a5966a4f-dcda-4143-9460-3681b5877362" />
 </Solution>
