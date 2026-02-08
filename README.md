@@ -12,13 +12,14 @@
 
 ## Introduction
 Nt.Automaton is an automate containing a set of states and transitions between those states.
-Each state or transition can be linked to an action, so that any structure or information for the user can be processed from a simple text.
+Each state or transition can be linked to an action, so that any structure or information for the user can be processed from any sequences.
+The entire automaton project is made for a generic type. From string to complex structures, there are possibility to read almost any data.
 
 Applications of this library include:
 - Parsing structured text formats (used for example in compilers or reading datas from files)
 - Updating user interfaces based on input or events
 - Behavior of entities (like PNJ in a video game or other simulations)
-- Any king of workflow or any other state-based logic
+- Any kind of workflow or any other state-based logic
 
 ## Features
 - Define states and transitions for an automate.
@@ -31,19 +32,19 @@ Applications of this library include:
 
 ### Creating a token
 The automaton functions by processing tokens that implement the `IAutomatonToken` interface.
-Such interface only requires a `string Name` property with a public getter, which represents the value of the token.
+Such interface only requires a `Name` property with a public getter, which represents the value of the token and can be of any type.
 
-Example of a custom token implementation:
+Example of the already implemented token:
 ```csharp
-using Nt.Automaton.Tokens;
-
-public class MyToken(string name) : IAutomatonToken
+public class AutomatonToken<T>(T name) : IAutomatonToken<T>
 {
-    public string Name { get; } = name;
+    public T Name { get; } = name;
 }
+
+// you need to specify the type of the token, for example AutomatonToken<string>
 ```
 
-The advantage of this interface is that you can extend any existing class to implement it, and then transform them into automaton tokens (without having to create new tokens).
+The advantage of `IAutomatonToken` is that you can extend any existing class to implement it, and then transform them into automaton tokens (without having to create a new class for tokens).
 
 ### Defining actions
 When a state is reached or a transition is taken, an action can be executed. These actions can be whatever you prefer and are yours to implement.
@@ -53,9 +54,9 @@ Example of a custom action implementation:
 ```csharp
 using Nt.Automaton.Actions;
 
-public class MyAction : IAction
+public class MyAction : IAction<string> // or int, char... 
 {
-	public void Perform(IAutomatonToken token)
+	public void Perform(IAutomatonToken<string> token)
 	{
 		// Your action logic here
 	}
@@ -115,51 +116,31 @@ stateB.AddTransition(new Transition(tokenA, stateA, action));
 ```
 
 ## Customising the automate
-It is possible to create your own automatons by implementing the `IAutomaton` interface and the method `Read(IAutomatonToken token)`.
+A particularity of `Nt.Automaton` is that components of largely customisable, including the automatons. This project includes some implementations for quick use like `StateAutomaton`, but feel free to create your own implementations at any time by extending the `IAutomaton` interface.
 
-Here is a list of available implenented automatons from the library:
+Two implementations already exists:
+- `Nt.Automaton.Automatons.StateAutomaton`
+- `Nt.Automaton.Automatons.StackAutomaton`
 
-#### State Automaton
-
-The `StateAutomaton` is a common automaton type with always one active state. It handles one token at a time.
-**Fields**
-|Name|Type|Description|
-|----|----|-----------|
-|InitialState|IState|The initial state, set in the constructor of the automaton|
-|CurrentState|IState|The current state of the automaton.|
-
-**Methods**
-|Name|Parameters|Return Type|Description|
-|----|----------|-----------|-----------|
-|StateAutomaton(IState initialState)|initial state of the automaton|StateAutomaton|Default constructor of a new instance of StateAutomaton|
-|Read(IAutomatonToken token)|token to read|void|Processes the given token and updates the current state accordingly.|
+See the [automatons documentation](Doc/Automaton.md) for more details.
 
 ---
 
 ### Custom states
-By extending the `IState` interface, it is possible to create other types of states. See the [states documentation](Doc/States.md) for more details.
+By extending the `IState` interface, it is possible to create other types of states than the default one `State`. 
 
+Two implementations are available:
+- `Nt.Automaton.States.State`
+- `Nt.Automaton.States.StillState`
 
+See the [states documentation](Doc/States.md) for more details.
 
 ---
 
 ### Custom transitions
-You can declare your own transitions by extending the `ITransition` interface, and implementing the three fields `string Value` (value for the transition to be taken), `IState NewState` (usually destination of the transition) and `IAction Action` (action linked to this transition).
+Similarly, you can declare your own transitions by extending the `ITransition` interface.
 
-This library already contains some implementations:
+One implementation is available:
+- `Nt.Automaton.Transitions.Transition`
 
-#### Transition
-This transition contains two constructors and only implement the three fields. The interpretation of each field is up to the state when taking the transition.
-
-**Field**
-|Name|Type|Description|
-|----|----|-----------|
-|Value|string|String value associated to the transition|
-|NewState|IState|State associated to the transition|
-|Action|IAction|Action associated to the transition|
-
-**Methods**
-|Name|Parameters|Return type|Description|
-|----|----------|-----------|-----------|
-|Transition(string value, IState newstate)|Value and state linked to this transition|Transition|Instantiates a new state with a value and a destination state|
-|Transition(string Value, IState newstate, IAction action)|Value, state and action linkied to this transition|Transition|Instantiates a new states with a value, a destination state and an action linked to it|
+See the [transitions documention](Doc/Transitions.md) for more details.

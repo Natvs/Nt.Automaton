@@ -14,8 +14,8 @@ namespace Nt.Automaton.States
     {
         public List<ITransition<T>> Transitions { get; } = [];
         public IState<T>? DefaultState { get; private set; }
-        public IAction<T>? DefaulAction { get; private set; }
-        public IAction<T>? Action { get; }
+        public ITokenAction<T>? DefaulAction { get; private set; }
+        public IAction Action { get; }
 
         /// <summary>
         /// Initializes a new instance of the State class.
@@ -25,7 +25,7 @@ namespace Nt.Automaton.States
         /// Initializes a new instance of the State class with the specified action.
         /// </summary>
         /// <param name="action">The action to associate with this state.</param>
-        public State(IAction<T> action)
+        public State(IAction action)
         {
             Action = action;
         }
@@ -46,7 +46,7 @@ namespace Nt.Automaton.States
         /// <param name="defaultState">The state to use as the default.</param>
         /// <param name="defaultAction">The action to use as the default.</param>
         /// <returns>The current instance with the updated default state and action.</returns>
-        public State<T> SetDefault(IState<T> defaultState, IAction<T> defaultAction)
+        public State<T> SetDefault(IState<T> defaultState, ITokenAction<T> defaultAction)
         {
             DefaultState = defaultState;
             DefaulAction = defaultAction;
@@ -120,7 +120,7 @@ namespace Nt.Automaton.States
 
             // Enters the new state and performs its action
             transition.Target.OnReached(args);
-            transition.Target.Action?.Perform(token);
+            transition.Target.Action?.Perform();
 
             return transition.Target;
         }
@@ -136,7 +136,7 @@ namespace Nt.Automaton.States
 
             // Enters the default state and performs its action
             DefaultState!.OnReached(args);
-            DefaultState?.Action?.Perform(token);
+            DefaultState?.Action?.Perform();
 
             return DefaultState!;
         }
@@ -145,6 +145,7 @@ namespace Nt.Automaton.States
         {
             StateReached?.Invoke(this, args);
         }
+
         public void OnLeft(StateEventArgs<T> args)
         {
             StateLeft?.Invoke(this, args);
@@ -154,6 +155,7 @@ namespace Nt.Automaton.States
         /// Event triggered after a transition that targets this state is taken.
         /// </summary>
         public event EventHandler<StateEventArgs<T>>? StateReached;
+
         /// <summary>
         /// Event triggered before a transition that departs from this state is taken.
         /// </summary>

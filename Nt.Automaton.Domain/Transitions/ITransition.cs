@@ -7,6 +7,6 @@ namespace Nt.Automaton.Transitions
     {
         T Value { get; }
         IState<T> Target { get; }
-        IAction<T>? Action { get; }
+        ITokenAction<T>? Action { get; }
     }
 }

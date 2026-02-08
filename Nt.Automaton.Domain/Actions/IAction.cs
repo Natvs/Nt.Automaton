@@ -1,10 +1,11 @@
-﻿using Nt.Automaton.Tokens;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace Nt.Automaton.Actions
 {
-    public interface IAction<T> 
+    public interface IAction
     {
-        void Perform(IAutomatonToken<T> token);
+        void Perform();
     }
-
 }

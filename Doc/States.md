@@ -13,7 +13,7 @@ All states have common features
 - A method `AddTransition(ITransition transition)` to add transitions from this state
 - Two events `OnReached` and `OnLeft` to trigger when the state is reached or left.
 
-These features describes the interface `IState` that all states must implement. The difference between the different instances of states that exist is the interpretation of the field, methods and events.
+These features describes the interface `IState` that all states must implement. The difference between the different instances of states that exist is the interpretation of the fields, methods and events.
 
 ## Different type of states
 
@@ -47,7 +47,7 @@ It also has fields `DefaultState` and `DefaultAction` when the token is none of 
 |SetDefault(IState state)|state to return when read if no transitions are valid|State|Set the default state to return when no transitions are valid.|
 |SetDefault(IState state, IAction action)|state and action to perform when read if no transitions are valid|State|Set the default state and actions when no transitions are valid.|
 |AddTransition(ITransition transitions)|transition to add|void|Adds a transition to the list of transitions.|
-|AddTransitions(ICollection<ITransition> transition)|collection of transitions to add|void|Shortcut for adding multiple transitions.|
+|AddTransitions(ICollection<ITransition> transitions)|collection of transitions to add|void|Shortcut for adding multiple transitions.|
 |OverwriteTransition(ITransition transition)|transition to overwrite|void|Overwrites an existing transition in the list of transitions.|
 |Read(IAutomatonToken token)|token to read to take a transition|State|Returns the target state of the right transition, or the default one if there is no such transition.|
 
@@ -61,17 +61,17 @@ It also has fields `DefaultState` and `DefaultAction` when the token is none of 
 
 All actions and events are performed when the method `Read(token)` is called.
 
-When a transition is taken:
+When a token is read:
 - If a transition with the token read exists:
 	1. The event `StateLeft` of the current state is invoked.
 	2. The action `Action` associated to the transition is performed.
-	3. The event `StateReached` of the target is performed.
-	4. The action `Action` of the target state is triggered.
+	3. The event `StateReached` of the target is invoked.
+	4. The action `Action` of the target state is performed.
 - If no transitions with the token read exists:
 	1. The event `StateLeft` of the current state is invoked.
 	2. The action `DefaultAction` is performed.
-	3. The event `StateReached` of the default target state is performed.
-	4. The action `Action` of the default target state is triggered.
+	3. The event `StateReached` of the default target state is invoked.
+	4. The action `Action` of the default target state is performed.
 
 ### StillState
 
@@ -99,7 +99,7 @@ It also has fields `DefaultState` and `DefaultAction` when the token is none of 
 |SetDefault(IState state)|state to return when read if no transitions are valid|StillState|Set the default state to return when no transitions are valid.|
 |SetDefault(IState state, IAction action)|state and action to perform when read if no transitions are valid|StillState|Set the default state and actions when no transitions are valid.|
 |AddTransition(ITransition transitions)|transition to add|void|Adds a transition to the list of transitions.|
-|AddTransitions(ICollection<ITransition> transition)|collection of transitions to add|void|Shortcut for adding multiple transitions.|
+|AddTransitions(ICollection<ITransition> transitions)|collection of transitions to add|void|Shortcut for adding multiple transitions.|
 |OverwriteTransition(ITransition transition)|transition to overwrite|void|Overwrites an existing transition in the list of transitions.|
 |Read(IAutomatonToken token)|token to read to take a transition|State|Returns the target state of the right transition, or the default one if there is no such transition.|
 
@@ -113,14 +113,14 @@ It also has fields `DefaultState` and `DefaultAction` when the token is none of 
 
 All actions and events are performed when the method `Read(token)` is called.
 
-When a transition is taken:
+When a token is read:
 - If a transition with the token read exists:
 	1. The event `StateLeft` of the current state is invoked.
 	2. The action `Action` associated to the transition is performed.
-	3. The event `StateReached` of the target is performed.
+	3. The event `StateReached` of the target is invoked.
 - If no transitions with the token read exists:
 	1. The event `StateLeft` of the current state is invoked.
 	2. The action `DefaultAction` is performed.
-	3. The event `StateReached` of the default target state is performed.
+	3. The event `StateReached` of the default target state is invoked.
 
 The action `Action` linked to the event is never triggered when reading. You have to execute it manually.

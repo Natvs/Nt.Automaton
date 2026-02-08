@@ -6,7 +6,7 @@ namespace Nt.Automaton.States
 {
     public interface IState<T>
     {
-        IAction<T>? Action { get; }
+        IAction? Action { get; }
 
         IState<T> Read(IAutomatonToken<T> token);
         void AddTransition(ITransition<T> transition);

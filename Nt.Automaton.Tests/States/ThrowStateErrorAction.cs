@@ -3,9 +3,9 @@ using Nt.Automaton.Tokens;
 
 namespace Nt.Tests.Automaton.States
 {
-    internal class ThrowStateErrorAction : IAction<string>
+    internal class ThrowStateErrorAction : IAction
     {
-        public void Perform(IAutomatonToken<string> token)
+        public void Perform()
         {
             throw new StateErrorException();
         }
