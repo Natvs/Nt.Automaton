@@ -1,6 +1,7 @@
 ﻿using Nt.Automaton.States;
 using Nt.Automaton.Tokens;
 using Nt.Automaton.Transitions;
+using Nt.Tests.Automaton.States.Instances;
 
 namespace Nt.Tests.Automaton.States
 {

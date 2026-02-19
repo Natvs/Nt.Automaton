@@ -69,10 +69,13 @@ namespace Nt.Automaton.Automatons
         /// <param name="performAction">Whether to perform the action linked to the state. Default is false.</param>
         public void Pop(bool performAction = false)
         {
-            if (Stack.Count == 0) return;
-            CurrentState = Stack.Pop();
+            if (Stack.Count > 0) 
+            {
+                CurrentState = Stack.Pop();
+                if (performAction) CurrentState.Action?.Perform();
+            }
+            else CurrentState = null;
             StatePopped?.Invoke(this, EventArgs.Empty);
-            if (performAction) CurrentState.Action?.Perform();
         }
 
         /// <summary>
@@ -81,8 +84,7 @@ namespace Nt.Automaton.Automatons
         /// <returns>true if the stack is empty; otherwise, false.</returns>
         public bool IsEmpty()
         {
-            if (Stack.Count == 0) return true;
-            return false;
+            return Stack.Count == 0 && CurrentState == null;
         }
 
         /// <summary>

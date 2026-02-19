@@ -1,9 +1,6 @@
 ﻿using Nt.Automaton.Tokens;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Nt.Tests.Automaton.Instances
+namespace Nt.Tests.Automaton.Automatons.Instances
 {
     internal class Token(string name) : IAutomatonToken<string>
     {

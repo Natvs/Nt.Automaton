@@ -115,7 +115,7 @@ stateA.AddTransition(new Transition(tokenB, stateB)));
 stateB.AddTransition(new Transition(tokenA, stateA, action));
 ```
 
-## Customising the automate
+## Customising the automaton
 A particularity of `Nt.Automaton` is that components of largely customisable, including the automatons. This project includes some implementations for quick use like `StateAutomaton`, but feel free to create your own implementations at any time by extending the `IAutomaton` interface.
 
 Two implementations already exists:

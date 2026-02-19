@@ -31,7 +31,7 @@ namespace Nt.Automaton.Transitions
         /// <param name="value">The value that triggers the transition.</param>
         /// <param name="newState">The state to which the transition leads when the specified value is read.</param>
         /// <param name="action">The action to perform when this transition is taken</param>
-        public Transition(T value, IState<T> newState, ITokenAction<T> action)
+        public Transition(T value, IState<T> newState, ITokenAction<T>? action)
         {
             Value = value;
             Target = newState;

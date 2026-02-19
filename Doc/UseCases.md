@@ -10,7 +10,10 @@ Here you will find some use cases of automatons and the differents combinations 
 You have one component for the user to fill. You have a text file written by a client that describes how to fill the component. You would like to read the text file and fill your component with the informations in it. Of course, some formats like `JSON` or `XML` can easily be parsed using already existing libraries. However these formats are not the most user-friendly ones, and you want the user to write content in a more natural language. So you decide of a syntax to use and inform the user about that.
 
 ### Problem
-The client provides you with such a file. Now you have to parse it and fill your component. You can use this project to do so.
+The client provides you with such a file. Now you have to parse it and fill your component. 
+
+### Solution
+This project can widely be used for parsing any kind of tokens sequence, including text tokens.
 
 **Remarks**: The first step is to split the file into tokens. This can be done using [Nt.Parser](https://github.com/Natvs/Nt.Parser) project for example (in that case, you'll have to create a token class that extends both `Nt.Automaton.Token.IAutomatonToken` and `Nt.Parser.Symbols.ISymbol`). In the following, the token resulting from the parsing is called `Token`.
 

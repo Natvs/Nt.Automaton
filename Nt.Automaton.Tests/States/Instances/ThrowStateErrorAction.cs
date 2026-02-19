@@ -1,5 +1,5 @@
 ﻿using Nt.Automaton.Actions;
-using Nt.Automaton.Tokens;
+using Nt.Tests.Automaton.States.Instances;
 
 namespace Nt.Tests.Automaton.States
 {

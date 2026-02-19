@@ -5,6 +5,7 @@
 
 # Custom files
 nuget.config
+.obsidian
 
 # User-specific files
 *.rsuser
