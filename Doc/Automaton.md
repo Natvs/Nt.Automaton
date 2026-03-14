@@ -63,7 +63,7 @@ sf --> [*]
 ### Stack Automaton
 ---
 
-The `StackAutomaton` is an automaton combined with a stack of states. When reading a state, the new state is pushed on the stack. The particularity of such an automaton is on default state (when no transition corresponds to the token read): instead of throwing an error, it returns to the previous state in the stack. Have a look on [a use case of this automaton](UseCases#configuration-with-interface).
+The `StackAutomaton` is an automaton combined with a stack of states. When reading a state, the new state is pushed on the stack. The particularity of such an automaton is on default state (when no transition corresponds to the token read): instead of throwing an error, it returns to the previous state in the stack. Have a look on [a use case of this automaton](UseCases#runtime-configuration-edition).
 
 Methods like `Push` and `Pop` allow to directly add or remove to and from the stack.
 

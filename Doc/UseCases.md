@@ -2,6 +2,19 @@
 
 Here you will find some use cases of automatons and the differents combinations of components used for each one of them.
 
+- [Text parsing](#text-parsing)
+    - [Context](#context)
+    - [Problem](#problem)
+    - [Solution](#solution)
+    - [Components used](#components-used)
+    - [Example](#example)
+- [Runtime configuration edition](#runtime-configuration-edition)
+    - [Context](#context-1)
+    - [Problem](#problem-1)
+    - [Solution](#solution-1)
+    - [Components used](#components-used-1)
+    - [Example](#example-1)
+
 ---
 
 ## Text parsing
@@ -144,7 +157,7 @@ class GridService(Grid grid) {
 
 ---
 
-## Configuration with interface
+## Runtime configuration edition
 
 ### Context
 You have a structure that is a global configuration for other components.
