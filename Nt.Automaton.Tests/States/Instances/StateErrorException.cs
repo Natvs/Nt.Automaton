@@ -1,4 +1,4 @@
-﻿namespace Nt.Tests.Automaton.States
+﻿namespace Nt.Tests.Automaton.States.Instances
 {
     internal class StateErrorException() : Exception() { }
 }

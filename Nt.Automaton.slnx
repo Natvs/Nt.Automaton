@@ -1,4 +1,10 @@
 <Solution>
+  <Folder Name="/Doc/">
+    <File Path="Doc/Automaton.md" />
+    <File Path="Doc/States.md" />
+    <File Path="Doc/Transitions.md" />
+    <File Path="Doc/UseCases.md" />
+  </Folder>
   <Folder Name="/Solution files/">
     <File Path=".gitattributes" />
     <File Path=".gitignore" />

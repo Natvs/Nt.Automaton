@@ -1,7 +1,8 @@
-﻿using Nt.Automaton.States;
+﻿using Nt.Automaton.Automatons.Exceptions;
+using Nt.Automaton.States;
 using Nt.Automaton.Tokens;
 
-namespace Nt.Automaton
+namespace Nt.Automaton.Automatons
 {
 
     /// <summary>
@@ -14,12 +15,13 @@ namespace Nt.Automaton
         public IState<T> CurrentState { get; private set; } = initialState;
 
         /// <summary>
-        /// Reads a token from the current state and updates current state to the next state
+        /// Read a token from the current state and goes to the next state.
         /// </summary>
         /// <param name="token">Automation token to read</param>
+        /// <exception cref="NullStateException">The current state may be null</exception>
         public void Read(IAutomatonToken<T> token)
         {
-            if (CurrentState == null) { return; }
+            if (CurrentState == null) { throw new NullStateException("Current state is null"); }
             CurrentState = CurrentState.Read(token);
         }
     }

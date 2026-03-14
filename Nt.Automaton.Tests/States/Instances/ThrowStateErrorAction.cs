@@ -1,11 +1,11 @@
 ﻿using Nt.Automaton.Actions;
-using Nt.Automaton.Tokens;
+using Nt.Tests.Automaton.States.Instances;
 
 namespace Nt.Tests.Automaton.States
 {
-    internal class ThrowStateErrorAction : IAction<string>
+    internal class ThrowStateErrorAction : IAction
     {
-        public void Perform(IAutomatonToken<string> token)
+        public void Perform()
         {
             throw new StateErrorException();
         }

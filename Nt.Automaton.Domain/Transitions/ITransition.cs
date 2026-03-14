@@ -6,7 +6,7 @@ namespace Nt.Automaton.Transitions
     public interface ITransition<T>
     {
         T Value { get; }
-        IState<T> NewState { get; }
-        IAction<T>? Action { get; }
+        IState<T> Target { get; }
+        ITokenAction<T>? Action { get; }
     }
 }

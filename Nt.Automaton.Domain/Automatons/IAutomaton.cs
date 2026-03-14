@@ -1,6 +1,6 @@
 ﻿using Nt.Automaton.Tokens;
 
-namespace Nt.Automaton
+namespace Nt.Automaton.Automatons
 {
     public interface IAutomaton<T>
     {

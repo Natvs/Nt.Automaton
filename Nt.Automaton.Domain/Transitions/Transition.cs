@@ -1,5 +1,6 @@
 ﻿using Nt.Automaton.Actions;
 using Nt.Automaton.States;
+using System.Reflection;
 
 namespace Nt.Automaton.Transitions
 {
@@ -10,8 +11,8 @@ namespace Nt.Automaton.Transitions
     public class Transition<T> : ITransition<T>
     {
         public T Value { get; }
-        public IState<T> NewState { get; }
-        public IAction<T>? Action { get; }
+        public IState<T> Target { get; }
+        public ITokenAction<T>? Action { get; }
 
         /// <summary>
         /// Initializes a new transition with the specified transition value and target state.
@@ -21,7 +22,7 @@ namespace Nt.Automaton.Transitions
         public Transition(T value, IState<T> newState)
         {
             Value = value;
-            NewState = newState;
+            Target = newState;
         }
 
         /// <summary>
@@ -30,10 +31,10 @@ namespace Nt.Automaton.Transitions
         /// <param name="value">The value that triggers the transition.</param>
         /// <param name="newState">The state to which the transition leads when the specified value is read.</param>
         /// <param name="action">The action to perform when this transition is taken</param>
-        public Transition(T value, IState<T> newState, IAction<T> action)
+        public Transition(T value, IState<T> newState, ITokenAction<T>? action)
         {
             Value = value;
-            NewState = newState;
+            Target = newState;
             Action = action;
         }
     }

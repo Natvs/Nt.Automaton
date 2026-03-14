@@ -12,8 +12,8 @@ namespace Nt.Automaton.States
     {
         public List<ITransition<T>> Transitions { get; } = [];
         public IState<T>? DefaultState { get; private set; }
-        public IAction<T>? DefaulAction { get; private set; }
-        public IAction<T>? Action { get; }
+        public ITokenAction<T>? DefaulAction { get; private set; }
+        public IAction? Action { get; }
 
         /// <summary>
         /// Initializes a new instance of the State class.
@@ -23,7 +23,7 @@ namespace Nt.Automaton.States
         /// Initializes a new instance of the State class with the specified action.
         /// </summary>
         /// <param name="action">The action to associate with this state.</param>
-        public StillState(IAction<T> action)
+        public StillState(IAction action)
         {
             Action = action;
         }
@@ -44,7 +44,7 @@ namespace Nt.Automaton.States
         /// <param name="defaultState">The state to use as the default.</param>
         /// <param name="defaultAction">The action to use as the default.</param>
         /// <returns>The current instance with the updated default state and action.</returns>
-        public StillState<T> SetDefault(IState<T> defaultState, IAction<T> defaultAction)
+        public StillState<T> SetDefault(IState<T> defaultState, ITokenAction<T> defaultAction)
         {
             DefaultState = defaultState;
             DefaulAction = defaultAction;
@@ -110,21 +110,28 @@ namespace Nt.Automaton.States
 
         private IState<T> TargetNewState(ITransition<T> transition, IAutomatonToken<T> token)
         {
+            var args = new StateEventArgs<T>(transition);
+
+            // Leaves the current state then performs the transition action
+            OnLeft(args);
             transition.Action?.Perform(token);
 
-            var args = new StateEventArgs<T>(transition);
-            OnLeft(args);
-            transition.NewState.OnReached(args);
+            // Enters the new state
+            transition.Target.OnReached(args);
 
-            return transition.NewState;
+            return transition.Target;
         }
         private IState<T> TargetDefaultState(IAutomatonToken<T> token)
         {
             if (DefaultState == null) throw new NoDefaultStateException();
-            DefaulAction?.Perform(token);
 
             var args = new StateEventArgs<T>(new Transition<T>(token.Value, DefaultState!));
+
+            // Leaves the current state then performs the default action
             OnLeft(args);
+            DefaulAction?.Perform(token);
+
+            // Enters the default state
             DefaultState!.OnReached(args);
 
             return DefaultState!;
@@ -142,11 +149,11 @@ namespace Nt.Automaton.States
         /// <summary>
         /// Event triggered after a transition that targets this state is taken.
         /// </summary>
-        public event EventHandler<StateEventArgs<T>> StateReached;
+        public event EventHandler<StateEventArgs<T>>? StateReached;
 
         /// <summary>
         /// Event triggered before a transition that departs from this state is taken.
         /// </summary>
-        public event EventHandler<StateEventArgs<T>> StateLeft;
+        public event EventHandler<StateEventArgs<T>>? StateLeft;
     }
 }
