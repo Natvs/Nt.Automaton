@@ -6,7 +6,7 @@
 	- [Creating a token](#creating-a-token)	 
 	- [Defining actions](#defining-actions)
 	- [Creating states and transition](#creating-states-and-transitions)
-- [Customising the automate](#customising-the-automate)
+- [Customising the automaton](#customising-the-automaton)
 	- [Custom states](#custom-states)
 	- [Custom transitions](#custom-transitions)
 
