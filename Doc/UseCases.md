@@ -256,6 +256,8 @@ class EnableAction(StackAutomaton automaton, Configuration config): IAction {
         var answer = Console.Readline;
         if (config == "1") config.Enabled = true;
         if (config == "2") config.Enabled = false;
+
+        automaton.Pop(true);
     }
 }
 
@@ -265,6 +267,8 @@ class IterationsAction(StackAutomaton automaton, Configuration config): IAction 
 
         var answer = Console.Readline();
         config.Iterations = (int)answer;
+
+        automaton.Pop(true);
     }
 }
 
@@ -283,6 +287,8 @@ class ModeAction(StackAutomaton automaton, Configuration config): IAction {
             "3" => Modes.HIGH,
             _ => config.Mode
         };
+
+        automaton.Pop(true);
     }
 }
 ```
