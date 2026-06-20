@@ -15,12 +15,13 @@ namespace Nt.Automaton.States
         public List<ITransition<T>> Transitions { get; } = [];
         public IState<T>? DefaultState { get; private set; }
         public ITokenAction<T>? DefaulAction { get; private set; }
-        public IAction Action { get; }
+        public IAction? Action { get; }
 
         /// <summary>
         /// Initializes a new instance of the State class.
         /// </summary>
         public State() { }
+
         /// <summary>
         /// Initializes a new instance of the State class with the specified action.
         /// </summary>
