@@ -21,6 +21,7 @@ namespace Nt.Automaton.States
         /// Initializes a new instance of the State class.
         /// </summary>
         public State() { }
+
         /// <summary>
         /// Initializes a new instance of the State class with the specified action.
         /// </summary>
