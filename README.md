@@ -6,7 +6,7 @@
 	- [Creating a token](#creating-a-token)	 
 	- [Defining actions](#defining-actions)
 	- [Creating states and transition](#creating-states-and-transitions)
-- [Customising the automate](#customising-the-automate)
+- [Customising the automaton](#customising-the-automaton)
 	- [Custom states](#custom-states)
 	- [Custom transitions](#custom-transitions)
 
@@ -89,34 +89,34 @@ var automaton = new StateAutomaton(defaultState);
 ```csharp
 using Nt.Automaton.States;
 
-# Define the tokens used in the automaton
+// Define the tokens used in the automaton
 var tokenA = new MyToken("A");
 var tokenB = new MyToken("B");
 
-# Define the actions that are triggered
+// Define the actions that are triggered
 var action = new MyAction();
 
-# Create a new state
+// Create a new state
 var stateA = new State();
 
-# Create a new state with an action to trigger when entering the state
+// Create a new state with an action to trigger when entering the state
 var stateB = new State(new MyAction());
 
-# Add a default state to transfer to when no transition is valid
+// Add a default state to transfer to when no transition is valid
 stateA.SetDefault(stateB);
 
-# Add a default state with an action to trigger when transferring to the default state
+// Add a default state with an action to trigger when transferring to the default state
 stateB.SetDefault(stateA, action);
 
-# Add a transition from stateA to stateB when the token read is "B"
+// Add a transition from stateA to stateB when the token read is "B"
 stateA.AddTransition(new Transition(tokenB, stateB)));
 
-# Add a transition from stateB to stateA with an action when the token read is "A"
+// Add a transition from stateB to stateA with an action when the token read is "A"
 stateB.AddTransition(new Transition(tokenA, stateA, action));
 ```
 
 ## Customising the automaton
-A particularity of `Nt.Automaton` is that components of largely customisable, including the automatons. This project includes some implementations for quick use like `StateAutomaton`, but feel free to create your own implementations at any time by extending the `IAutomaton` interface.
+A particularity of `Nt.Automaton` is that components are largely customisable, including the automatons. This project includes some implementations for quick use like `StateAutomaton`, but feel free to create your own implementations at any time by extending the `IAutomaton` interface.
 
 Two implementations already exists:
 - `Nt.Automaton.Automatons.StateAutomaton`
