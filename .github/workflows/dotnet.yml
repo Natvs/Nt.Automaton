@@ -34,6 +34,7 @@ jobs:
     
     runs-on: ubuntu-latest
     env:
+      ProjectPath: "./Nt.Automaton.Domain"
       NuGetDirectory: "${{github.workspace}}/nuget"
 
     steps:
@@ -51,7 +52,7 @@ jobs:
             --password ${{ secrets.PACKAGE_REPO_TOKEN }} \
             --store-password-in-clear-text
       - name: Pack
-        run: dotnet pack ./Domain --configuration Release --output ${{env.NuGetDirectory}}
+        run: dotnet pack ${{env.ProjectPath}} --configuration Release --output ${{env.NuGetDirectory}}
       - name: Publish
         shell: pwsh
         run: |
