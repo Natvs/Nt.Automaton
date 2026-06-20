@@ -57,5 +57,5 @@ jobs:
         shell: pwsh
         run: |
           Get-ChildItem -Path "${{env.NuGetDirectory}}" -Filter "*.nupkg" | ForEach-Object {
-              dotnet nuget push $_.FullName --source "github"
+              dotnet nuget push $_.FullName --source "github" --skip-duplicate
           }
