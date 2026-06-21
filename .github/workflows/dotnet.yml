@@ -27,35 +27,23 @@ jobs:
     - name: Test
       run: dotnet test --no-build --verbosity normal
 
+  # This job requires a secret token PACKAGE_REPO_TOKEN with write access to the local package repository
   publish-nuget:
 
     needs: build
     if: github.event_name == 'push'
-    
+
     runs-on: ubuntu-latest
     env:
       ProjectPath: "./Nt.Automaton.Domain"
-      NuGetDirectory: "${{github.workspace}}/nuget"
+      Source: https://nuget.pkg.github.com/Natvs/index.json
 
     steps:
-      - uses: actions/checkout@v4
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v7
+      - name: Publish to local repository
+        uses: Rebel028/publish-nuget@v2.8.0
         with:
-          dotnet-version: 10.0.x
-      - name: Authenticate GitHub package source
-        run: |
-          dotnet nuget add source \
-          https://nuget.pkg.github.com/Natvs/index.json \
-            --name github \
-            --username Natvs \
-            --password ${{ secrets.PACKAGE_REPO_TOKEN }} \
-            --store-password-in-clear-text
-      - name: Pack
-        run: dotnet pack ${{env.ProjectPath}} --configuration Release --output ${{env.NuGetDirectory}}
-      - name: Publish
-        shell: pwsh
-        run: |
-          Get-ChildItem -Path "${{env.NuGetDirectory}}" -Filter "*.nupkg" | ForEach-Object {
-              dotnet nuget push $_.FullName --source "github" --skip-duplicate
-          }
+          PROJECT_FILE_PATH: ${{env.ProjectPath}}
+          NUGET_SOURCE: ${{env.Source}}
+          NUGET_KEY: ${{secrets.PACKAGE_REPO_TOKEN}}
+          GITHUB_USER: Natvs
