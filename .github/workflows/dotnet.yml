@@ -27,6 +27,19 @@ jobs:
     - name: Test
       run: dotnet test --no-build --verbosity normal
 
+  generate-sbom:
+
+    runs-on: ubuntu-latest
+    env:
+      Target: ./Nt.Automaton.Domain/Nt.Automaton.Domain.csproj
+
+    steps:
+      - name: Generate SBOM
+        uses: CycloneDX/gh-dotnet-generate-sbom@master
+        with:
+          path: ${{env.Target}}
+          json: true
+
   # This job requires a secret token PACKAGE_REPO_TOKEN with write access to the local package repository
   publish-nuget:
 
@@ -35,7 +48,7 @@ jobs:
 
     runs-on: ubuntu-latest
     env:
-      ProjectPath: "./Nt.Automaton.Domain"
+      ProjectPath: ./Nt.Automaton.Domain
       Source: https://nuget.pkg.github.com/Natvs/index.json
 
     steps:
