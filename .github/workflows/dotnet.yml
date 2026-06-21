@@ -29,11 +29,13 @@ jobs:
 
   generate-sbom:
 
+    needs: build
     runs-on: ubuntu-latest
     env:
       Target: ./Nt.Automaton.Domain/Nt.Automaton.Domain.csproj
 
     steps:
+      - uses: actions/checkout@v7
       - name: Generate SBOM
         uses: CycloneDX/gh-dotnet-generate-sbom@master
         with:
@@ -45,12 +47,12 @@ jobs:
 
     needs: build
     if: github.event_name == 'push'
-
+    
     runs-on: ubuntu-latest
     env:
       ProjectPath: ./Nt.Automaton.Domain
       Source: https://nuget.pkg.github.com/Natvs/index.json
-
+    
     steps:
       - uses: actions/checkout@v7
       - name: Publish to local repository
