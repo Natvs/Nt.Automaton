@@ -2,18 +2,21 @@
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
 
 name: .NET
-
 on:
   push:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
 
+env:
+  PROJECT_PATH: Nt.Automaton.Domain
+  PROJECT_FILE: Nt.Automaton.Domain\Nt.Automaton.Domain.csproj
+  SBOM_DIR: Nt.Automaton.Domain\tmp
+  SBOM_ARTIFACT: sbom
+
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v7
     - name: Setup .NET
@@ -26,45 +29,87 @@ jobs:
       run: dotnet build --no-restore
     - name: Test
       run: dotnet test --no-build --verbosity normal
-
+    
   generate-sbom:
-
     needs: build
     runs-on: ubuntu-latest
-    env:
-      Target: ./Nt.Automaton.Domain/Nt.Automaton.Domain.csproj
-      Storage: ./Nt.Automaton.Domain/sbom
-
     steps:
       - uses: actions/checkout@v7
       - name: Generate SBOM
         uses: CycloneDX/gh-dotnet-generate-sbom@v1.0.1
         with:
-          path:  ${{env.Target}}
-          out: ${{env.Storage}}
+          path:  ${{env.PROJECT_FILE}}
+          out: ${{env.SBOM_DIR}}
           json: true
       - name: Upload artifact
         uses: actions/upload-artifact@v7.0.1
         with:
-          path: ${{env.Storage}}
+          name: ${{env.SBOM_ARTIFACT}}
+          path: ${{env.SBOM_DIR}}
 
   # This job requires a secret token PACKAGE_REPO_TOKEN with write access to the local package repository
   publish-nuget:
-
     needs: build
-    if: github.event_name == 'push' && github.base_ref == 'master'
-    
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     env:
       ProjectPath: ./Nt.Automaton.Domain
-      Source: https://nuget.pkg.github.com/Natvs/index.json
     
     steps:
       - uses: actions/checkout@v7
-      - name: Publish to local repository
+      - name: Publish nuget to local repository
         uses: Rebel028/publish-nuget@v2.8.0
         with:
           PROJECT_FILE_PATH: ${{env.ProjectPath}}
-          NUGET_SOURCE: ${{env.Source}}
+          NUGET_SOURCE: ${{env.SBOM_DIR}}
           NUGET_KEY: ${{secrets.PACKAGE_REPO_TOKEN}}
           GITHUB_USER: Natvs
+  
+  check-release:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v7
+    - name: Retrieve version
+      id: version
+      run: |
+        VERSION=$(dotnet msbuild ./${{env.PROJECT_FILE}} -getProperty:Version)
+        echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+    - name: Create tag
+      id: tag
+      run: |
+        TAG=v${{steps.version.outputs.version}}
+        echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+        if gh release view "$TAG" > /dev/null 2>&1;
+        then      
+          echo "create=true" >> "$GITHUB_OUTPUT"
+          echo "Release $TAG already exists.";     
+        else     
+          echo "create=false" >> "$GITHUB_OUTPUT"
+          echo "Release $TAG does not exist.";     fi
+    outputs:
+      tag: ${{steps.tag.outputs.tag}}
+      create-release: ${{steps.tag.outputs.create}}
+
+  create-release:
+    needs:
+      - check-release
+      - generate-sbom
+    if: ${{needs.check-release.outputs.create-release == 'true'}}
+    runs-on: ubuntu-latest
+  
+    steps:
+    - name: Download SBOM
+      uses: actions/download-artifact@v3.1.0
+      with:
+        name: ${{env.SBOM_ARTIFACT}}
+        path: ${{env.SBOM_DIR}}
+    - name: Make release
+      uses: softprops/action-gh-release@v3.0.0
+      with:
+        tag_name: ${{needs.check-release.outputs.tag}}
+        files: 
+          ${{env.SBOM_DIR}}/${{env.SBOM_ARTIFACT}}
+
+    
