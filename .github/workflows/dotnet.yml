@@ -62,7 +62,7 @@ jobs:
         uses: Rebel028/publish-nuget@v2.8.0
         with:
           PROJECT_FILE_PATH: ${{env.PROJECT_PATH}}/${{env.PROJECT_FILE}}
-          NUGET_SOURCE: https://nuget.pkg.github.com/Natvs/index.json
+          NUGET_SOURCE: https://nuget.pkg.github.com/Natvs
           NUGET_KEY: ${{secrets.PACKAGE_REPO_TOKEN}}
           GITHUB_USER: Natvs
   
