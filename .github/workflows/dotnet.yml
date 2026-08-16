@@ -76,7 +76,8 @@ jobs:
         id: version
         run: |
           cd ${{env.PROJECT_PATH}}  
-          dotnet msbuild ./${{env.PROJECT_FILE}} -getProperty:Version
+          VERSION=$(dotnet msbuild ${{env.PROJECT_FILE}} -getProperty:Version)
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
       - name: Create tag
         id: tag
         run: |
@@ -89,9 +90,16 @@ jobs:
           else     
             echo "create=false" >> "$GITHUB_OUTPUT"
             echo "Release $TAG does not exist. A new release will be created.";     fi
+      - name: Retrieve release note
+        id: release-note  
+        run: |
+          cd ${{env.PROJECT_PATH}}
+          NOTES=$(dotnet msbuild ${{env.PROJECT_FILE}} -getProperty:ReleasesNotes)
+          echo "notes=$NOTES" >> "$GITHUB_OUTPUT"
     outputs:
       tag: ${{steps.tag.outputs.tag}}
       create-release: ${{steps.tag.outputs.create}}
+      notes: ${{steps.release-note.outputs.notes}}
 
   create-release:
     needs:
@@ -112,6 +120,7 @@ jobs:
         uses: softprops/action-gh-release@v3.0.0
         with:
           tag_name: ${{needs.check-release.outputs.tag}}
+          body: ${{needs.check-release.outputs.notes}}
           files: 
             ${{env.SBOM_DIR}}/${{env.SBOM_ARTIFACT}}
 
