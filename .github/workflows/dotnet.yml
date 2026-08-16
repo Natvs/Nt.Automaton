@@ -85,10 +85,10 @@ jobs:
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           if gh release view "$TAG" > /dev/null 2>&1;
           then      
-            echo "create=true" >> "$GITHUB_OUTPUT"
+            echo "create=false" >> "$GITHUB_OUTPUT"
             echo "Release $TAG already exists. No release will be created.";     
           else     
-            echo "create=false" >> "$GITHUB_OUTPUT"
+            echo "create=true" >> "$GITHUB_OUTPUT"
             echo "Release $TAG does not exist. A new release will be created.";     fi
       - name: Retrieve release note
         id: release-note  
