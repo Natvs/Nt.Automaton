@@ -112,7 +112,7 @@ jobs:
       - name: Checkout solution
         uses: actions/checkout@v7
       - name: Download SBOM
-        uses: actions/download-artifact@v3.1.0
+        uses: actions/download-artifact@v8
         with:
           name: ${{env.SBOM_ARTIFACT}}
           path: ${{env.SBOM_DIR}}
