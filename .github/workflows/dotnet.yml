@@ -77,23 +77,10 @@ jobs:
       - name: Retrieve version
         id: version
         run: |
-          VERSION=$(dotnet msbuild ./${{env.PROJECT_FILE}} -getProperty:Version)
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-      - name: Create tag
-        id: tag
-        run: |
-          TAG=v${{steps.version.outputs.version}}
-          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-          if gh release view "$TAG" > /dev/null 2>&1;
-          then      
-            echo "create=true" >> "$GITHUB_OUTPUT"
-            echo "Release $TAG already exists. No release will be created.";     
-          else     
-            echo "create=false" >> "$GITHUB_OUTPUT"
-            echo "Release $TAG does not exist. A new release will be created.";     fi
+          dotnet msbuild ./${{env.PROJECT_FILE}} -getProperty:Version
     outputs:
-      tag: ${{steps.tag.outputs.tag}}
-      create-release: ${{steps.tag.outputs.create}}
+      tag: "null"
+      create-release: "false"
 
   create-release:
     needs:
