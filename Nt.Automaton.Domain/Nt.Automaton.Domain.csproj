@@ -1,19 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-	<RootNamespace>Nt.Automaton</RootNamespace>
-	<Title>Nt.Automaton</Title>
-	<Description>Automaton with states that can trigger actions</Description>
-	<PackageReadmeFile>README.md</PackageReadmeFile>
-	<RepositoryUrl>https://github.com/Natvs/Nt.Automaton</RepositoryUrl>
-	<RepositoryType>git</RepositoryType>
-	<PackageTags>automate ; automaton ; states</PackageTags>
-	<PackageReleaseNotes>Minor patch to package 1.1.0</PackageReleaseNotes>
-	<PackageVersion>1.1.1</PackageVersion>
-	<PackageId>Nt.Automaton</PackageId>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	  
+		<Title>Nt.Automaton</Title>
+		<RootNamespace>Nt.Automaton</RootNamespace>
+		<Description>Automaton with states that can trigger actions</Description>
+		<Version>1.1.2</Version>
+		<ReleasesNotes>Automatically publishes SBOM for associated nuget packages with new releases</ReleasesNotes>
+	  
+		<RepositoryUrl>https://github.com/Natvs/Nt.Automaton</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+
+		<PackageId>Nt.Automaton</PackageId>
+		<PackageVersion>1.1.1</PackageVersion>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageTags>automate ; automaton ; states</PackageTags>
+		<PackageReleaseNotes>Automatically publishes SBOM for associated nuget packages with new releases</PackageReleaseNotes>
+	</PropertyGroup>
 
   <ItemGroup>
     <None Include="..\README.md">
