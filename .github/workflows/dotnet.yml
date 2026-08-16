@@ -33,20 +33,26 @@ jobs:
     runs-on: ubuntu-latest
     env:
       Target: ./Nt.Automaton.Domain/Nt.Automaton.Domain.csproj
+      Storage: ./Nt.Automaton.Domain/sbom
 
     steps:
       - uses: actions/checkout@v7
       - name: Generate SBOM
-        uses: CycloneDX/gh-dotnet-generate-sbom@master
+        uses: CycloneDX/gh-dotnet-generate-sbom@v1.0.1
         with:
-          path: ${{env.Target}}
+          path:  ${{env.Target}}
+          out: ${{env.Storage}}
           json: true
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          path: ${{env.Storage}}
 
   # This job requires a secret token PACKAGE_REPO_TOKEN with write access to the local package repository
   publish-nuget:
 
     needs: build
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' && github.base_ref == 'master'
     
     runs-on: ubuntu-latest
     env:
