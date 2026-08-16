@@ -11,7 +11,7 @@ on:
 env:
   PROJECT_PATH: Nt.Automaton.Domain
   PROJECT_FILE: Nt.Automaton.Domain.csproj
-  SBOM_DIR: Nt.Automaton.Domain\tmp
+  SBOM_DIR: Nt.Automaton.Domain/tmp
   SBOM_ARTIFACT: sbom
 
 jobs:
@@ -54,8 +54,6 @@ jobs:
     needs: build
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
-    env:
-      ProjectPath: ./Nt.Automaton.Domain
     
     steps:
       - name: Checkout solution
@@ -63,7 +61,7 @@ jobs:
       - name: Publish nuget to local repository
         uses: Rebel028/publish-nuget@v2.8.0
         with:
-          PROJECT_FILE_PATH: ${{env.ProjectPath}}
+          PROJECT_FILE_PATH: ${{env.PROJECT_PATH}}
           NUGET_SOURCE: ${{env.SBOM_DIR}}
           NUGET_KEY: ${{secrets.PACKAGE_REPO_TOKEN}}
           GITHUB_USER: Natvs
@@ -75,7 +73,7 @@ jobs:
       - name: Checkout solution
         uses: actions/checkout@v7 
       - name: Checkout project
-        run: cd ${{env.ProjectPath}}  
+        run: cd ${{env.PROJECT_PATH}}  
       - name: Retrieve version
         id: version
         run: |
