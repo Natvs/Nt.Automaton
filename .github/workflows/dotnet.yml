@@ -115,6 +115,10 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: ${{env.SBOM_ARTIFACT}}
+      - name: Check downloaded files
+        run: |
+          pwd
+          find . -maxdepth 3 -type f -print
       - name: Make release
         uses: softprops/action-gh-release@v3.0.0
         with:
