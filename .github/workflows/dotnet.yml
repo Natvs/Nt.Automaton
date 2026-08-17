@@ -83,7 +83,7 @@ jobs:
         run: |
           TAG=v${{steps.version.outputs.version}}
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-          if gh release view "$TAG" > /dev/null 2>&1;
+          if gh release view "$TAG";
           then      
             echo "create=false" >> "$GITHUB_OUTPUT"
             echo "Release $TAG already exists. No release will be created.";     
@@ -115,7 +115,7 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: ${{env.SBOM_ARTIFACT}}
-          path: ${{env.SBOM_ARTIFACT}}
+          path: ${{env.SBOM_DIR}}
       - name: Make release
         uses: softprops/action-gh-release@v3.0.0
         with:
@@ -123,6 +123,6 @@ jobs:
           tag_name: ${{needs.check-release.outputs.tag}}
           body: ${{needs.check-release.outputs.notes}}
           files: 
-            ${{env.SBOM_ARTIFACT}}
+            ${{env.SBOM_DIR}}/*
 
     
