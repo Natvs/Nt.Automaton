@@ -1,21 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Nt.Automaton;
-using Nt.Automaton.States;
+﻿using Nt.Automaton.States;
 using Nt.Automaton.Tokens;
 using Nt.Automaton.Transitions;
+using Nt.Tests.Automaton.States.Instances;
 
-namespace Nt.Tests.Automaton.States
+namespace Nt.Tests.Automaton.States.Decorators
 {
-    public class StillStateTest
+    public class ActionStateTest
     {
         // Target states
 
         [Fact]
-        public void StillState_DefaultTransition_ValidState()
+        public void ActionState_DefaultTransition_ValidState()
         {
-            var initial = new StillState<string>();
+            var initial = new State<string>();
             initial.SetDefault(initial);
 
             var new_state = initial.Read(new AutomatonToken<string>("a"));
@@ -24,9 +21,9 @@ namespace Nt.Tests.Automaton.States
         }
 
         [Fact]
-        public void StillState_MultipleDefaultTransition_ValidState()
+        public void ActionState_MultipleDefaultTransition_ValidState()
         {
-            var initial = new StillState<string>();
+            var initial = new State<string>();
             initial.SetDefault(initial);
 
             IState<string> new_state = initial;
@@ -39,10 +36,10 @@ namespace Nt.Tests.Automaton.States
         }
 
         [Fact]
-        public void StillState_Transition_ValidState()
+        public void ActionState_Transition_ValidState()
         {
-            var initial = new StillState<string>();
-            var second = new StillState<string>();
+            var initial = new State<string>();
+            var second = new State<string>();
             initial.AddTransition(new Transition<string>("a", second));
 
             var new_state = initial.Read(new AutomatonToken<string>("a"));
@@ -53,32 +50,30 @@ namespace Nt.Tests.Automaton.States
         // Actions
 
         [Fact]
-        public void StillState_DefaultTransition_NoStateActionPerformed()
+        public void ActionState_DefaultTransition_StateActionPerformed()
         {
-            var initial = new StillState<string>(new ThrowStateErrorAction());
+            var initial = new State<string>().SetAction(new ThrowStateErrorAction());
             initial.SetDefault(initial);
 
-            // Should throw an exception if the state action is performed
-            initial.Read(new AutomatonToken<string>("a"));
+            Assert.Throws<StateErrorException>(() => initial.Read(new AutomatonToken<string>("a")));
         }
 
         [Fact]
-        public void StillState_Transition_NoStateActionPerformed()
+        public void ActionState_Transition_StateActionPerformed()
         {
-            var initial = new StillState<string>();
-            var second = new StillState<string>(new ThrowStateErrorAction());
+            var initial = new State<string>();
+            var second = new State<string>().SetAction(new ThrowStateErrorAction());
             initial.AddTransition(new Transition<string>("a", second));
 
-            // Should throw an exception if the state action is performed
-            initial.Read(new AutomatonToken<string>("a"));
+            Assert.Throws<StateErrorException>(() => initial.Read(new AutomatonToken<string>("a")));
         }
 
         // Events
 
         [Fact]
-        public void State_DefaultTransition_LeftEventTriggered()
+        public void ActionState_DefaultTransition_LeftEventTriggered()
         {
-            var initial = new StillState<string>();
+            var initial = new State<string>();
             bool left_triggered = false;
             initial.SetDefault(initial);
             initial.StateLeft += (state, token) => { left_triggered = true; };
@@ -89,9 +84,9 @@ namespace Nt.Tests.Automaton.States
         }
 
         [Fact]
-        public void State_DefaultTransition_ReachedEventTriggered()
+        public void ActionState_DefaultTransition_ReachedEventTriggered()
         {
-            var initial = new StillState<string>();
+            var initial = new State<string>();
             bool reached_triggered = false;
             initial.SetDefault(initial);
             initial.StateReached += (state, token) => { reached_triggered = true; };
@@ -102,10 +97,10 @@ namespace Nt.Tests.Automaton.States
         }
 
         [Fact]
-        public void State_Transition_LeftEventTriggered()
+        public void ActionState_Transition_LeftEventTriggered()
         {
-            var initial = new StillState<string>();
-            var second = new StillState<string>();
+            var initial = new State<string>();
+            var second = new State<string>();
             bool left_triggered = false;
             initial.AddTransition(new Transition<string>("a", second));
             initial.StateLeft += (state, token) => { left_triggered = true; };
@@ -116,10 +111,10 @@ namespace Nt.Tests.Automaton.States
         }
 
         [Fact]
-        public void State_Transition_ReachedEventTriggered()
+        public void ActionState_Transition_ReachedEventTriggered()
         {
-            var initial = new StillState<string>();
-            var second = new StillState<string>();
+            var initial = new State<string>();
+            var second = new State<string>();
             bool reached_triggered = false;
             initial.AddTransition(new Transition<string>("a", second));
             second.StateReached += (state, token) => { reached_triggered = true; };

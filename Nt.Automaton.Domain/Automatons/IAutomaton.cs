@@ -1,4 +1,5 @@
-﻿using Nt.Automaton.Tokens;
+﻿using Nt.Automaton.States;
+using Nt.Automaton.Tokens;
 
 namespace Nt.Automaton.Automatons
 {

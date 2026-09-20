@@ -1,7 +1,6 @@
 ﻿using Nt.Automaton.States;
 using Nt.Automaton.Tokens;
 using Nt.Automaton.Transitions;
-using Nt.Tests.Automaton.States.Instances;
 
 namespace Nt.Tests.Automaton.States
 {
@@ -45,27 +44,6 @@ namespace Nt.Tests.Automaton.States
             var new_state = initial.Read(new AutomatonToken<string>("a"));
 
             Assert.Equal(second, new_state);
-        }
-
-        // Actions
-
-        [Fact]
-        public void State_DefaultTransition_StateActionPerformed()
-        {
-            var initial = new State<string>(new ThrowStateErrorAction());
-            initial.SetDefault(initial);
-
-            Assert.Throws<StateErrorException>(() => initial.Read(new AutomatonToken<string>("a")));
-        }
-
-        [Fact]
-        public void State_Transition_StateActionPerformed()
-        {
-            var initial = new State<string>();
-            var second = new State<string>(new ThrowStateErrorAction());
-            initial.AddTransition(new Transition<string>("a", second));
-
-            Assert.Throws<StateErrorException>(() => initial.Read(new AutomatonToken<string>("a")));
         }
 
         // Events

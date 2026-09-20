@@ -38,7 +38,8 @@ namespace Nt.Tests.Automaton.Automatons
         public void StateAutomaton_SingleTransition_ValidStateAction()
         {
             var action = new IncrementAction();
-            State<string> initial = new(), state1 = new(action);
+            IState<string> initial = new State<string>();
+            IState<string> state1 = new State<string>().SetAction(action);
             StateSequence(initial, [(state1, "a")]);
 
             var automaton = new StateAutomaton<string>(initial);
@@ -51,7 +52,11 @@ namespace Nt.Tests.Automaton.Automatons
         public void StateAutomaton_MultipleTransitions_ValidStateAction()
         {
             var action = new IncrementAction();
-            State<string> initial = new(), state1 = new(action), state2 = new(action), state3 = new(action), state4 = new(action);
+            IState<string> initial = new State<string>();
+            IState<string> state1 = new State<string>().SetAction(action);
+            IState<string> state2 = new State<string>().SetAction(action);
+            IState<string> state3 = new State<string>().SetAction(action);
+            IState<string> state4 = new State<string>().SetAction(action);
             StateSequence(initial, [(state1, "a"), (state2, "b"), (state3, "c"), (state4, "d")]);
 
             var automaton = new StateAutomaton<string>(initial);
@@ -102,7 +107,8 @@ namespace Nt.Tests.Automaton.Automatons
         public void StateAutomaton_DefaultTransition_ValidStateAction()
         {
             var action = new IncrementAction();
-            State<string> initial = new(), state1 = new(action);
+            IState<string> initial = new State<string>();
+            IState<string> state1 = new State<string>().SetAction(action);
             initial.SetDefault(state1);
 
             var automaton = new StateAutomaton<string>(initial);

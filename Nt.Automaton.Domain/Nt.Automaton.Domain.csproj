@@ -3,7 +3,8 @@
 		<TargetFramework>net10.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-	  
+		<OutputType>Library</OutputType>
+		
 		<Title>Nt.Automaton</Title>
 		<RootNamespace>Nt.Automaton</RootNamespace>
 		<Description>Automaton with states that can trigger actions</Description>
@@ -25,6 +26,10 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Transitions\Decorators\" />
   </ItemGroup>
 
 </Project>

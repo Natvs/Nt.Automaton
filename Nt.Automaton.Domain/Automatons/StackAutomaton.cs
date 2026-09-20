@@ -2,6 +2,7 @@
 using Nt.Automaton.States;
 using Nt.Automaton.States.Exceptions;
 using Nt.Automaton.Tokens;
+using Nt.Automaton.Transitions;
 using System.Reflection;
 
 namespace Nt.Automaton.Automatons
@@ -46,7 +47,7 @@ namespace Nt.Automaton.Automatons
             catch (NoDefaultStateException)
             {
                 CurrentState.StateLeft -= Push;
-                Pop(AutoPerformAction);
+                Pop();
             }
         }
 
@@ -55,24 +56,22 @@ namespace Nt.Automaton.Automatons
         /// </summary>
         /// <param name="new_state">The state to transition to.</param>
         /// <param name="performAction">Whether to perform the action linked to the state. Default is false.</param>
-        public void Push(IState<T> new_state, bool performAction = false)
+        public void Push(IState<T> new_state)
         {
             if (CurrentState != null) Stack.Push(CurrentState);
             CurrentState = new_state;
             StatePushed?.Invoke(this, EventArgs.Empty);
-            if (performAction) CurrentState.Action?.Perform();
         }
 
         /// <summary>
         /// Pop the last state from the stack and goes back to it.
         /// </summary>
         /// <param name="performAction">Whether to perform the action linked to the state. Default is false.</param>
-        public void Pop(bool performAction = false)
+        public void Pop()
         {
             if (Stack.Count > 0) 
             {
                 CurrentState = Stack.Pop();
-                if (performAction) CurrentState.Action?.Perform();
             }
             else CurrentState = null;
             StatePopped?.Invoke(this, EventArgs.Empty);

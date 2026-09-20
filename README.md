@@ -100,7 +100,7 @@ var action = new MyAction();
 var stateA = new State();
 
 // Create a new state with an action to trigger when entering the state
-var stateB = new State(new MyAction());
+var stateB = new State().SetAction(new MyAction(), true);
 
 // Add a default state to transfer to when no transition is valid
 stateA.SetDefault(stateB);
@@ -119,8 +119,8 @@ stateB.AddTransition(new Transition(tokenA, stateA, action));
 A particularity of `Nt.Automaton` is that components are largely customisable, including the automatons. This project includes some implementations for quick use like `StateAutomaton`, but feel free to create your own implementations at any time by extending the `IAutomaton` interface.
 
 Two implementations already exists:
-- `Nt.Automaton.Automatons.StateAutomaton`
-- `Nt.Automaton.Automatons.StackAutomaton`
+- `Nt.Automaton.Automatons.StateAutomaton` : Ideal for a single state automaton, where only one state is active at a time.
+- `Nt.Automaton.Automatons.StackAutomaton` : Ideal for a signle 
 
 See the [automatons documentation](Doc/Automaton.md) for more details.
 
@@ -129,18 +129,11 @@ See the [automatons documentation](Doc/Automaton.md) for more details.
 ### Custom states
 By extending the `IState` interface, it is possible to create other types of states than the default one `State`. 
 
-Two implementations are available:
-- `Nt.Automaton.States.State`
-- `Nt.Automaton.States.StillState`
-
 See the [states documentation](Doc/States.md) for more details.
 
 ---
 
 ### Custom transitions
 Similarly, you can declare your own transitions by extending the `ITransition` interface.
-
-One implementation is available:
-- `Nt.Automaton.Transitions.Transition`
 
 See the [transitions documention](Doc/Transitions.md) for more details.
