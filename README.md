@@ -112,7 +112,7 @@ stateB.SetDefault(stateA, action);
 stateA.AddTransition(new Transition(tokenB, stateB)));
 
 // Add a transition from stateB to stateA with an action when the token read is "A"
-stateB.AddTransition(new Transition(tokenA, stateA, action));
+stateB.AddTransition(new Transition(tokenA, stateA).SetAction(action));
 ```
 
 ## Customising the automaton

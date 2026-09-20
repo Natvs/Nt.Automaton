@@ -26,8 +26,9 @@ namespace Nt.Automaton.States.Decorators
         public void Activate()
         {
             Action.Perform();
+            State.Activate();
         }
-        public void Deactivate() { }
+        public void Deactivate() => State.Deactivate();
 
         public IState<T> SetDefault(IState<T> defaultState) => State.SetDefault(defaultState);
         public IState<T> SetDefault(IState<T> defaultState, ITokenAction<T> defaultAction) => State.SetDefault(defaultState, defaultAction);

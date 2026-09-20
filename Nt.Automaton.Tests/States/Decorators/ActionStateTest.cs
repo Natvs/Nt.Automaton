@@ -40,9 +40,10 @@ namespace Nt.Tests.Automaton.States.Decorators
         {
             var initial = new State<string>();
             var second = new State<string>();
-            initial.AddTransition(new Transition<string>("a", second));
+            var token = new AutomatonToken<string>("a");
+            initial.AddTransition(new Transition<string>(token, second));
 
-            var new_state = initial.Read(new AutomatonToken<string>("a"));
+            var new_state = initial.Read(token);
 
             Assert.Equal(second, new_state);
         }
@@ -63,9 +64,10 @@ namespace Nt.Tests.Automaton.States.Decorators
         {
             var initial = new State<string>();
             var second = new State<string>().SetAction(new ThrowStateErrorAction());
-            initial.AddTransition(new Transition<string>("a", second));
+            var token = new AutomatonToken<string>("a");
+            initial.AddTransition(new Transition<string>(token, second));
 
-            Assert.Throws<StateErrorException>(() => initial.Read(new AutomatonToken<string>("a")));
+            Assert.Throws<StateErrorException>(() => initial.Read(token));
         }
 
         // Events
@@ -102,10 +104,11 @@ namespace Nt.Tests.Automaton.States.Decorators
             var initial = new State<string>();
             var second = new State<string>();
             bool left_triggered = false;
-            initial.AddTransition(new Transition<string>("a", second));
+            var token = new AutomatonToken<string>("a");
+            initial.AddTransition(new Transition<string>(token, second));
             initial.StateLeft += (state, token) => { left_triggered = true; };
 
-            initial.Read(new AutomatonToken<string>("a"));
+            initial.Read(token);
 
             Assert.True(left_triggered);
         }
@@ -116,10 +119,11 @@ namespace Nt.Tests.Automaton.States.Decorators
             var initial = new State<string>();
             var second = new State<string>();
             bool reached_triggered = false;
-            initial.AddTransition(new Transition<string>("a", second));
+            var token = new AutomatonToken<string>("a");
+            initial.AddTransition(new Transition<string>(token, second));
             second.StateReached += (state, token) => { reached_triggered = true; };
 
-            initial.Read(new AutomatonToken<string>("a"));
+            initial.Read(token);
 
             Assert.True(reached_triggered);
         }

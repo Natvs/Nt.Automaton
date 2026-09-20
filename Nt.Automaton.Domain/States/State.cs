@@ -3,6 +3,7 @@ using Nt.Automaton.States.Decorators;
 using Nt.Automaton.States.Exceptions;
 using Nt.Automaton.Tokens;
 using Nt.Automaton.Transitions;
+using System.Diagnostics;
 using System.Transactions;
 
 namespace Nt.Automaton.States
@@ -45,7 +46,7 @@ namespace Nt.Automaton.States
             List<ITransition<T>> toRemove = [];
             foreach (var t in Transitions)
             {
-                if (t.Value != null && t.Value.Equals(transition.Value)) toRemove.Add(t);
+                if (t.Accepts(transition.Token)) toRemove.Add(t);
             }
             foreach (var t in toRemove)
             {
@@ -65,8 +66,7 @@ namespace Nt.Automaton.States
         {
             foreach (var transition in Transitions)
             {
-                if (transition.Value == null) throw new NullTransitionTokenValue();
-                if (transition.Value.Equals(token.Value))
+                if (transition.Accepts(token))
                 {
                     return TargetNewState(transition, token);
                 }
@@ -80,7 +80,7 @@ namespace Nt.Automaton.States
 
             // Leaves the current state then performs the transition action
             OnLeft(args);
-            transition.Action?.Perform(token);
+            transition.Trigger(token);
 
             // Enters the new state
             transition.Target.OnReached(args);
@@ -91,7 +91,7 @@ namespace Nt.Automaton.States
         protected virtual IState<T> TargetDefaultState(IAutomatonToken<T> token)
         {
             if (DefaultState == null) throw new NoDefaultStateException();
-            var args = new StateEventArgs<T>(new Transition<T>(token.Value, DefaultState));
+            var args = new StateEventArgs<T>(new Transition<T>(token, DefaultState));
 
             // Leaves the current state then performs the transition action
             OnLeft(args);

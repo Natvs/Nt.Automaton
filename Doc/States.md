@@ -103,9 +103,11 @@ In addition to the existing states, you can override the default behavior by imp
 Example:
 
 ```csharp
+using Nt.Automaton.States;
+using Nt.Automaton.Actions;
 
 # This state lets you define an action triggered when leaving the state
-public class MyState<T> : Nt.Automaton.States.State<T>
+public class MyState<T> : State<T>
 {
 	private Action { get; set; }
 	
