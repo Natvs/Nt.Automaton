@@ -41,12 +41,12 @@ namespace Nt.Automaton.Automatons
 
             try
             {
-                CurrentState.StateLeft += Push;
+                CurrentState.Leave += Push;
                 CurrentState.Read(token);
             }
             catch (NoDefaultStateException)
             {
-                CurrentState.StateLeft -= Push;
+                CurrentState.Leave -= Push;
                 Pop();
             }
         }
@@ -103,7 +103,7 @@ namespace Nt.Automaton.Automatons
         private Stack<IState<T>> Stack { get; } = new();
         private void Push(object? sender, StateEventArgs<T> e)
         {
-            CurrentState?.StateLeft -= Push;
+            CurrentState?.Leave -= Push;
 
             if (e.Transition == null) return;
             Push(e.Transition.Target);

@@ -12,7 +12,7 @@ namespace Nt.Tests.Automaton.States.Decorators
         [Fact]
         public void ActionState_DefaultTransition_ValidState()
         {
-            var initial = new State<string>();
+            var initial = new State<string>().SetAction(new EmptyAction());
             initial.SetDefault(initial);
 
             var new_state = initial.Read(new AutomatonToken<string>("a"));
@@ -23,7 +23,7 @@ namespace Nt.Tests.Automaton.States.Decorators
         [Fact]
         public void ActionState_MultipleDefaultTransition_ValidState()
         {
-            var initial = new State<string>();
+            var initial = new State<string>().SetAction(new EmptyAction());
             initial.SetDefault(initial);
 
             IState<string> new_state = initial;
@@ -38,8 +38,8 @@ namespace Nt.Tests.Automaton.States.Decorators
         [Fact]
         public void ActionState_Transition_ValidState()
         {
-            var initial = new State<string>();
-            var second = new State<string>();
+            var initial = new State<string>().SetAction(new EmptyAction());
+            var second = new State<string>().SetAction(new EmptyAction());
             var token = new AutomatonToken<string>("a");
             initial.AddTransition(new Transition<string>(token, second));
 
@@ -70,62 +70,95 @@ namespace Nt.Tests.Automaton.States.Decorators
             Assert.Throws<StateErrorException>(() => initial.Read(token));
         }
 
+
         // Events
 
         [Fact]
-        public void ActionState_DefaultTransition_LeftEventTriggered()
+        public void ActionState_RaiseEvents_OnTransition()
         {
-            var initial = new State<string>();
-            bool left_triggered = false;
-            initial.SetDefault(initial);
-            initial.StateLeft += (state, token) => { left_triggered = true; };
-
-            initial.Read(new AutomatonToken<string>("a"));
-
-            Assert.True(left_triggered);
-        }
-
-        [Fact]
-        public void ActionState_DefaultTransition_ReachedEventTriggered()
-        {
-            var initial = new State<string>();
-            bool reached_triggered = false;
-            initial.SetDefault(initial);
-            initial.StateReached += (state, token) => { reached_triggered = true; };
-
-            initial.Read(new AutomatonToken<string>("a"));
-
-            Assert.True(reached_triggered);
-        }
-
-        [Fact]
-        public void ActionState_Transition_LeftEventTriggered()
-        {
-            var initial = new State<string>();
-            var second = new State<string>();
-            bool left_triggered = false;
+            var initial = new State<string>().SetAction(new EmptyAction());
+            var second = new State<string>().SetAction(new EmptyAction());
             var token = new AutomatonToken<string>("a");
-            initial.AddTransition(new Transition<string>(token, second));
-            initial.StateLeft += (state, token) => { left_triggered = true; };
+            bool deactivated_raised = false, leave_raised = false, reach_raised = false, activated_raised = false;
 
+            initial.AddTransition(new Transition<string>(token, second));
+            initial.Deactivated += (sender, args) => deactivated_raised = true;
+            initial.Leave += (sender, args) => leave_raised = true;
+            second.Reach += (sender, args) => reach_raised = true;
+            second.Activated += (sender, args) => activated_raised = true;
             initial.Read(token);
 
-            Assert.True(left_triggered);
+            Assert.True(deactivated_raised);
+            Assert.True(leave_raised);
+            Assert.True(reach_raised);
+            Assert.True(activated_raised);
         }
 
         [Fact]
-        public void ActionState_Transition_ReachedEventTriggered()
+        public void ActionState_RaiseEventsInRigthSequence_OnTransition()
         {
-            var initial = new State<string>();
-            var second = new State<string>();
-            bool reached_triggered = false;
+            var initial = new State<string>().SetAction(new EmptyAction());
+            var second = new State<string>().SetAction(new EmptyAction());
             var token = new AutomatonToken<string>("a");
-            initial.AddTransition(new Transition<string>(token, second));
-            second.StateReached += (state, token) => { reached_triggered = true; };
+            int counter = 0;
+            int deactivated = 0, leave = 0, reach = 0, activated = 0;
 
+            initial.AddTransition(new Transition<string>(token, second));
+            initial.Deactivated += (sender, args) => { deactivated = counter; counter++; };
+            initial.Leave += (sender, args) => { leave = counter; counter++; };
+            second.Reach += (sender, args) => { reach = counter; counter++; };
+            second.Activated += (sender, args) => { activated = counter; counter++; };
             initial.Read(token);
 
-            Assert.True(reached_triggered);
+            Assert.Equal(0, deactivated);
+            Assert.Equal(1, leave);
+            Assert.Equal(2, reach);
+            Assert.Equal(3, activated);
         }
+
+        [Fact]
+        public void ActionState_RaiseEvents_OnDefaultTransition()
+        {
+            var initial = new State<string>().SetAction(new EmptyAction());
+            var second = new State<string>().SetAction(new EmptyAction());
+            var token = new AutomatonToken<string>("a");
+            bool deactivated_raised = false, leave_raised = false, reach_raised = false, activated_raised = false;
+
+            initial.SetDefault(second);
+            initial.Deactivated += (sender, args) => deactivated_raised = true;
+            initial.Leave += (sender, args) => leave_raised = true;
+            second.Reach += (sender, args) => reach_raised = true;
+            second.Activated += (sender, args) => activated_raised = true;
+            initial.Read(token);
+
+            Assert.True(deactivated_raised);
+            Assert.True(leave_raised);
+            Assert.True(reach_raised);
+            Assert.True(activated_raised);
+        }
+
+        [Fact]
+        public void ActionState_RaiseEventsInRigthSequence_OnDefaultTransition()
+        {
+            var initial = new State<string>().SetAction(new EmptyAction());
+            var second = new State<string>().SetAction(new EmptyAction());
+            var token = new AutomatonToken<string>("a");
+            int counter = 0;
+            int deactivated = 0, leave = 0, reach = 0, activated = 0;
+
+            initial.SetDefault(second);
+            initial.Deactivated += (sender, args) => { deactivated = counter; counter++; };
+            initial.Leave += (sender, args) => { leave = counter; counter++; };
+            second.Reach += (sender, args) => { reach = counter; counter++; };
+            second.Activated += (sender, args) => { activated = counter; counter++; };
+            initial.Read(token);
+
+            Assert.Equal(0, deactivated);
+            Assert.Equal(1, leave);
+            Assert.Equal(2, reach);
+            Assert.Equal(3, activated);
+        }
+
+
     }
 }

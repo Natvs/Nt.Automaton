@@ -28,7 +28,12 @@ namespace Nt.Automaton.Transitions
             return new ActionTransition<T>(this, action);
         }
 
-        public void Trigger(IAutomatonToken<T> token) { }
+        public void Trigger(IAutomatonToken<T> token) 
+        {
+            Triggered?.Invoke(this, new TransitionEventsArgs<T>(token));
+        }
+
+        public event EventHandler<TransitionEventsArgs<T>>? Triggered;
     }
 
 }

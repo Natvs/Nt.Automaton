@@ -24,7 +24,9 @@ namespace Nt.Automaton.Transitions.Decorators
         {
             Action.Perform(token);
             Transition.Trigger(token);
+            Triggered?.Invoke(this, new TransitionEventsArgs<T>(token));
         }
 
+        public event EventHandler<TransitionEventsArgs<T>>? Triggered;
     }
 }

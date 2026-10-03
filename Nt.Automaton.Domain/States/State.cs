@@ -18,9 +18,6 @@ namespace Nt.Automaton.States
         public IState<T>? DefaultState { get; private set; }
         public ITokenAction<T>? DefaulAction { get; private set; }
 
-        public void Activate() { }
-        public void Deactivate() { }
-
         public IState<T> SetDefault(IState<T> defaultState)
         {
             DefaultState = defaultState;
@@ -79,11 +76,11 @@ namespace Nt.Automaton.States
             var args = new StateEventArgs<T>(transition);
 
             // Leaves the current state then performs the transition action
-            OnLeft(args);
+            OnLeave(args);
             transition.Trigger(token);
 
             // Enters the new state
-            transition.Target.OnReached(args);
+            transition.Target.OnReach(args);
 
             return transition.Target;
         }
@@ -94,30 +91,38 @@ namespace Nt.Automaton.States
             var args = new StateEventArgs<T>(new Transition<T>(token, DefaultState));
 
             // Leaves the current state then performs the transition action
-            OnLeft(args);
+            OnLeave(args);
             DefaulAction?.Perform(token);
 
             // Enters the default state
-            DefaultState.OnReached(args);
+            DefaultState.OnReach(args);
 
             return DefaultState!;
         }
 
-        public void OnReached(StateEventArgs<T> args)
+        public void Activate() 
         {
-            StateReached?.Invoke(this, args);
+            Activated?.Invoke(this, new EventArgs());
+        }
+        public void Deactivate() 
+        {
+            Deactivated?.Invoke(this, new EventArgs());
+        }
+        public void OnReach(StateEventArgs<T> args)
+        {
+            Reach?.Invoke(this, args);
             Activate();
         }
-
-        public void OnLeft(StateEventArgs<T> args)
+        public void OnLeave(StateEventArgs<T> args)
         {
             Deactivate();
-            StateLeft?.Invoke(this, args);
+            Leave?.Invoke(this, args);
         }
 
-        public event EventHandler<StateEventArgs<T>>? StateReached;
-
-        public event EventHandler<StateEventArgs<T>>? StateLeft;
+        public event EventHandler? Activated;
+        public event EventHandler? Deactivated;
+        public event EventHandler<StateEventArgs<T>>? Reach;
+        public event EventHandler<StateEventArgs<T>>? Leave;
     }
 
 }

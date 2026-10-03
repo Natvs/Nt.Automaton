@@ -18,7 +18,7 @@ namespace Nt.Automaton.Transitions
         bool Accepts(IAutomatonToken<T> token);
 
         /// <summary>
-        /// Add an action to the transition. The action will be executed when the transition is triggered.
+        /// Set an action to this transition. The action will be executed when the transition is triggered.
         /// </summary>
         /// <param name="action">Action to set on this transition</param>
         /// <returns>The new transition with the action</returns>
@@ -29,5 +29,7 @@ namespace Nt.Automaton.Transitions
         /// </summary>
         /// <param name="token">The token to trigger the transition with</param>
         void Trigger(IAutomatonToken<T> token);
+
+        event EventHandler<TransitionEventsArgs<T>>? Triggered;
     }
 }

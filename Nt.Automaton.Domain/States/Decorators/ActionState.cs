@@ -1,11 +1,6 @@
 ﻿using Nt.Automaton.Actions;
-using Nt.Automaton.States.Exceptions;
 using Nt.Automaton.Tokens;
 using Nt.Automaton.Transitions;
-using System;
-using System.Collections.Generic;
-using System.Reflection.Metadata.Ecma335;
-using System.Text;
 
 namespace Nt.Automaton.States.Decorators
 {
@@ -15,20 +10,13 @@ namespace Nt.Automaton.States.Decorators
 
         public IAction Action { get; private set; }
 
-        public ActionState(IState<T> state, IAction action, bool auto_trigger = false) {
+        public ActionState(IState<T> state, IAction action) {
             State = state;
             Action = action;
 
-            State.StateLeft += (sender, args) => { OnLeft(args); };
-            State.StateReached += (sender, args) => { OnReached(args); };
+            State.Leave += (sender, args) => { OnLeave(args); };
+            State.Reach += (sender, args) => { OnReach(args); };
         }
-
-        public void Activate()
-        {
-            Action.Perform();
-            State.Activate();
-        }
-        public void Deactivate() => State.Deactivate();
 
         public IState<T> SetDefault(IState<T> defaultState) => State.SetDefault(defaultState);
         public IState<T> SetDefault(IState<T> defaultState, ITokenAction<T> defaultAction) => State.SetDefault(defaultState, defaultAction);
@@ -46,18 +34,32 @@ namespace Nt.Automaton.States.Decorators
 
         // Events
 
-        public void OnReached(StateEventArgs<T> args)
+        public void OnReach(StateEventArgs<T> args)
         {
-            StateReached?.Invoke(this, args);
+            Reach?.Invoke(this, args);
             Activate();
         }
-        public void OnLeft(StateEventArgs<T> args)
+        public void OnLeave(StateEventArgs<T> args)
         {
             Deactivate();
-            StateLeft?.Invoke(this, args);
+            Leave?.Invoke(this, args);
         }
 
-        public event EventHandler<StateEventArgs<T>>? StateReached;
-        public event EventHandler<StateEventArgs<T>>? StateLeft;
+        public void Activate()
+        {
+            Action.Perform();
+            State.Activate();
+            Activated?.Invoke(this, EventArgs.Empty);
+        }
+        public void Deactivate()
+        {
+            State.Deactivate();
+            Deactivated?.Invoke(this, EventArgs.Empty);
+        }
+
+        public event EventHandler? Activated;
+        public event EventHandler? Deactivated;
+        public event EventHandler<StateEventArgs<T>>? Reach;
+        public event EventHandler<StateEventArgs<T>>? Leave;
     }
 }

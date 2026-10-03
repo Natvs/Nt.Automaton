@@ -8,15 +8,6 @@ namespace Nt.Automaton.States
     public interface IState<T>
     {
         /// <summary>
-        /// Activates this state, allowing it to perform any necessary setup or initialization.
-        /// </summary>
-        void Activate();
-        /// <summary>
-        /// Deactivates this state, allowing it to perform any necessary cleanup or teardown.
-        /// </summary>
-        void Deactivate();
-
-        /// <summary>
         /// Sets the default state for this instance.
         /// </summary>
         /// <param name="defaultState">The state to use as the default.</param>
@@ -70,25 +61,44 @@ namespace Nt.Automaton.States
         // Events
 
         /// <summary>
-        /// Triggers the <see cref="StateReached"/> event
+        /// Activates this state, allowing it to perform any necessary setup or initialization.
+        /// </summary>
+        void Activate();
+        /// <summary>
+        /// Deactivates this state, allowing it to perform any necessary cleanup or teardown.
+        /// </summary>
+        void Deactivate();
+
+        /// <summary>
+        /// Triggers the <see cref="Reach"/> event
         /// </summary>
         /// <param name="args">Event arguments</param>
-        void OnReached(StateEventArgs<T> args);
+        void OnReach(StateEventArgs<T> args);
         /// <summary>
-        /// Triggers the <see cref="StateLeft"/> event
+        /// Triggers the <see cref="Leave"/> event
         /// </summary>
         /// <param name="args"></param>
-        void OnLeft(StateEventArgs<T> args);
+        void OnLeave(StateEventArgs<T> args);
+
+        /// <summary>
+        /// Event triggered when this state is activated.
+        /// </summary>
+        event EventHandler? Activated;
+        /// <summary>
+        /// Event triggered when this state is deactivated.
+        /// </summary>
+        event EventHandler? Deactivated;
 
         /// <summary>
         /// Event triggered after a transition that targets this state is taken.
         /// </summary>
-        event EventHandler<StateEventArgs<T>>? StateReached;
+        event EventHandler<StateEventArgs<T>>? Reach;
 
         /// <summary>
         /// Event triggered before a transition that departs from this state is taken.
         /// </summary>
-        event EventHandler<StateEventArgs<T>>? StateLeft;
+        event EventHandler<StateEventArgs<T>>? Leave;
+
 
     }
 }

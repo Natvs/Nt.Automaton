@@ -40,39 +40,47 @@ Same as `AddTransition` but overwrites the existing transition if one with the s
 
 Add multiple transitions to the list of transitions.
 
-### IState\<T\> SetDefault(IState state)
+### IState\<T\> SetDefault(IState\<T\> state)
 
 Set a state to transfer to when no transitions are valid.
 
 Returns: The current state.
 
-### IState\<T\> SetDefault(IState state, ITokenAction action)
+### IState\<T\> SetDefault(IState\<T\> state, ITokenAction action)
 
 Set a state and an action to perform when no transitions are valid.
 
 Returns: The current state.
 
-### IState\<T\> Read(IAutomatonToken token)
+### IState\<T\> Read(IAutomatonToken\<T\> token)
 
 Read a token and return the target state of the first matching transition, or the default one if there is no such transition.
 
 Returns: The target state of the transition, or the default one if there is no such transition.
 
-### IState\<T\> SetAction(ITokenAction action, bool auto_perform = false)
+### IState\<T\> SetAction(ITokenAction\<T\> action)
 
 Set an action to perform when the state is reached. 
 
-If auto_perform is true, the action is performed when the state is reached. If auto_perform is false, the action is not performed automatically and must be performed manually.
+If auto_perform is true, the action is performed when the state is reached.
 
 Returns: The current state.
 
 ## Events
 
-### EventHandler\<StateEventArgs\<T\>\>? StateLeft
+### EventHandler? Activated
+
+Event triggered once the state is activated
+
+### EventHandler? Deactivated
+
+Event triggered once the state is deactivated
+
+### EventHandler\<StateEventArgs\<T\>\>? Leave
 
 Event triggered when a state is left (before a transition).
 
-### EventHandler\<StateEventArgs\<T\>\>? StateReached
+### EventHandler\<StateEventArgs\<T\>\>? Reach
 
 Event triggered when a state is reached (after a transition).
 
@@ -81,18 +89,18 @@ Event triggered when a state is reached (after a transition).
 When a token is read and a transition is found, the following methods are called in order:
 
 1. The `Deactivate` method of the current state is called.
-2. The event `StateLeft` is raised from the current state.
+2. The event `Leave` is raised from the current state.
 3. The action linked to the transition is performed, if any.
-4. The event `StateReached` is raised from the target state.
+4. The event `Reach` is raised from the target state.
 5. The `Activate` method of the target state is called.
 
 When a token is read and no transition is found, the following methods are called in order:
 
 1. A runtime exception is thrown if no default state is set.
 2. The `Deactivate` method of the current state is called.
-3. The event `StateLeft` is raised from the current state.
+3. The event `Leave` is raised from the current state.
 4. The default action is performed, if any.
-5. The event `StateReached` is raised from the default state.
+5. The event `Reach` is raised from the default state.
 6. The `Activate` method of the default state is called.
 
 
