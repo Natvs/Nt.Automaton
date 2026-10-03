@@ -7,6 +7,8 @@ namespace Nt.Automaton.States
 {
     public interface IState<T>
     {
+        bool IsFinal { get; }
+
         /// <summary>
         /// Sets the default state for this instance.
         /// </summary>
@@ -55,8 +57,14 @@ namespace Nt.Automaton.States
         /// Sets an action to be performed when this state is reached.
         /// </summary>
         /// <param name="action">Action to perform.</param>
-        /// <returns>The current instance with the action set.</returns>
+        /// <returns>A new instance with the action set.</returns>
         IActionState<T> SetAction(IAction action);
+
+        /// <summary>
+        /// Sets this state as a final state, indicating that it is an accepting state in the automaton.
+        /// </summary>
+        /// <returns>A new instance set as final.</returns>
+        IFinalState<T> SetFinal();
 
         // Events
 

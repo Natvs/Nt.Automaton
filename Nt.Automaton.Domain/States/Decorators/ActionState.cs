@@ -6,9 +6,10 @@ namespace Nt.Automaton.States.Decorators
 {
     public class ActionState<T> : IActionState<T>
     {
-        public IState<T> State { get; }
+        private IState<T> State { get; }
 
         public IAction Action { get; private set; }
+        public bool IsFinal => State.IsFinal;
 
         public ActionState(IState<T> state, IAction action) {
             State = state;
@@ -25,6 +26,7 @@ namespace Nt.Automaton.States.Decorators
             Action = action;
             return this;
         }
+        public IFinalState<T> SetFinal() => new FinalState<T>(this);
 
         public void AddTransition(ITransition<T> transition) => State.AddTransition(transition);
         public void OverwriteTransition(ITransition<T> transition) => State.OverwriteTransition(transition);

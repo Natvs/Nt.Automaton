@@ -17,6 +17,7 @@ namespace Nt.Automaton.States
         public List<ITransition<T>> Transitions { get; } = [];
         public IState<T>? DefaultState { get; private set; }
         public ITokenAction<T>? DefaulAction { get; private set; }
+        public bool IsFinal { get => false; }
 
         public IState<T> SetDefault(IState<T> defaultState)
         {
@@ -32,6 +33,11 @@ namespace Nt.Automaton.States
         public IActionState<T> SetAction(IAction action)
         {
             return new ActionState<T>(this, action);
+        }
+
+        public IFinalState<T> SetFinal()
+        {
+            return new FinalState<T>(this);
         }
 
         public void AddTransition(ITransition<T> transition)

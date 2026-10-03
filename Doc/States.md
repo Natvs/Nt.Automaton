@@ -58,13 +58,25 @@ Read a token and return the target state of the first matching transition, or th
 
 Returns: The target state of the transition, or the default one if there is no such transition.
 
-### IState\<T\> SetAction(ITokenAction\<T\> action)
+### IActionState\<T\> SetAction(ITokenAction\<T\> action)
 
 Set an action to perform when the state is reached. 
 
 If auto_perform is true, the action is performed when the state is reached.
 
-Returns: The current state.
+Returns: A new new state with the action set.
+
+### IFinalState\<T\> SetFinal()
+
+Set the state as a final state.
+
+Returns: A new state with the final flag set.
+
+### IFinalState\<T\> OnCondition(Func\<bool\> condition)
+
+This method is only available on final states. It sets a condition to check when the state is reached. If the condition returns false, the state is not considered as reached.
+
+Returns: The current final state.
 
 ## Events
 
