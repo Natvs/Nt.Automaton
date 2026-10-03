@@ -13,7 +13,7 @@ namespace Nt.Tests.Automaton.States.Decorators
         public void ActionState_DefaultTransition_ValidState()
         {
             var initial = new State<string>().SetAction(new EmptyAction());
-            initial.SetDefault(initial);
+            initial.SetDefault(new Transition<string>(initial));
 
             var new_state = initial.Read(new AutomatonToken<string>("a"));
 
@@ -24,7 +24,7 @@ namespace Nt.Tests.Automaton.States.Decorators
         public void ActionState_MultipleDefaultTransition_ValidState()
         {
             var initial = new State<string>().SetAction(new EmptyAction());
-            initial.SetDefault(initial);
+            initial.SetDefault(new Transition<string>(initial));
 
             IState<string> new_state = initial;
             foreach (var letter in new List<string>(["a", "b", "c", "d", "e", "f"]))
@@ -54,7 +54,7 @@ namespace Nt.Tests.Automaton.States.Decorators
         public void ActionState_DefaultTransition_StateActionPerformed()
         {
             var initial = new State<string>().SetAction(new ThrowStateErrorAction());
-            initial.SetDefault(initial);
+            initial.SetDefault(new Transition<string>(initial));
 
             Assert.Throws<StateErrorException>(() => initial.Read(new AutomatonToken<string>("a")));
         }
@@ -124,7 +124,7 @@ namespace Nt.Tests.Automaton.States.Decorators
             var token = new AutomatonToken<string>("a");
             bool deactivated_raised = false, leave_raised = false, reach_raised = false, activated_raised = false;
 
-            initial.SetDefault(second);
+            initial.SetDefault(new Transition<string>(second));
             initial.Deactivated += (sender, args) => deactivated_raised = true;
             initial.Leave += (sender, args) => leave_raised = true;
             second.Reach += (sender, args) => reach_raised = true;
@@ -146,7 +146,7 @@ namespace Nt.Tests.Automaton.States.Decorators
             int counter = 0;
             int deactivated = 0, leave = 0, reach = 0, activated = 0;
 
-            initial.SetDefault(second);
+            initial.SetDefault(new Transition<string>(second));
             initial.Deactivated += (sender, args) => { deactivated = counter; counter++; };
             initial.Leave += (sender, args) => { leave = counter; counter++; };
             second.Reach += (sender, args) => { reach = counter; counter++; };

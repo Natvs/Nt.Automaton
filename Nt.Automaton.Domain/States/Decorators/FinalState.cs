@@ -26,15 +26,11 @@ namespace Nt.Automaton.States.Decorators
             State.Deactivated += (sender, args) => { Deactivated?.Invoke(this, args); };
         }
 
-        public IState<T> SetDefault(IState<T> defaultState) => State.SetDefault(defaultState);
-
-        public IState<T> SetDefault(IState<T> defaultState, ITokenAction<T> defaultAction) => State.SetDefault(defaultState, defaultAction);
+        public IState<T> SetDefault(ITransition<T> transition) => State.SetDefault(transition);
 
         public void AddTransition(ITransition<T> transition) => State.AddTransition(transition);
 
         public void OverwriteTransition(ITransition<T> transition) => State.OverwriteTransition(transition);
-
-        public void AddTransitions(ICollection<ITransition<T>> transitions) => State.AddTransitions(transitions);
 
 
         public IState<T> Read(IAutomatonToken<T> token) => State.Read(token);

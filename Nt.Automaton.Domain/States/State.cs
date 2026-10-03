@@ -15,19 +15,12 @@ namespace Nt.Automaton.States
     public class State<T>() : IState<T>
     {
         public List<ITransition<T>> Transitions { get; } = [];
-        public IState<T>? DefaultState { get; private set; }
-        public ITokenAction<T>? DefaulAction { get; private set; }
+        public ITransition<T>? DefaultTransition { get; private set; }
         public bool IsFinal { get => false; }
 
-        public IState<T> SetDefault(IState<T> defaultState)
+        public IState<T> SetDefault(ITransition<T> transition)
         {
-            DefaultState = defaultState;
-            return this;
-        }     
-        public IState<T> SetDefault(IState<T> defaultState, ITokenAction<T> defaultAction)
-        {
-            DefaultState = defaultState;
-            DefaulAction = defaultAction;
+            DefaultTransition = transition;
             return this;
         }
         public IActionState<T> SetAction(IAction action)
@@ -57,13 +50,6 @@ namespace Nt.Automaton.States
             }
             Transitions.Add(transition);
         }
-        public void AddTransitions(ICollection<ITransition<T>> transitions)
-        {
-            foreach (var transition in transitions)
-            {
-                Transitions.Add(transition);
-            }
-        }
 
         public IState<T> Read(IAutomatonToken<T> token)
         {
@@ -74,7 +60,8 @@ namespace Nt.Automaton.States
                     return TargetNewState(transition, token);
                 }
             }
-            return TargetDefaultState(token);
+            if (DefaultTransition is null) throw new NoDefaultTransitionException();
+            return TargetNewState(DefaultTransition, token);
         }
 
         protected virtual IState<T> TargetNewState(ITransition<T> transition, IAutomatonToken<T> token)
@@ -89,21 +76,6 @@ namespace Nt.Automaton.States
             transition.Target.OnReach(args);
 
             return transition.Target;
-        }
-
-        protected virtual IState<T> TargetDefaultState(IAutomatonToken<T> token)
-        {
-            if (DefaultState == null) throw new NoDefaultStateException();
-            var args = new StateEventArgs<T>(new Transition<T>(token, DefaultState));
-
-            // Leaves the current state then performs the transition action
-            OnLeave(args);
-            DefaulAction?.Perform(token);
-
-            // Enters the default state
-            DefaultState.OnReach(args);
-
-            return DefaultState!;
         }
 
         public void Activate() 

@@ -144,8 +144,8 @@ class GridService(Grid grid) {
         var readColumnState = new State();
         var fillGridState = new State();
 
-        readLineState.AddDefault(readColumnState, new SetLinesAction(grid));
-        readColumnState.AddDefault(fillGridState, new SetColumnsAction(grid));
+        readLineState.SetDefault(new Transition(readColumnState).SetAction(new SetLinesAction(grid)));
+        readColumnState.SetDefault(new Transition(fillGridState).SetAction(new SetColumnsAction(grid)));
         fillGridState.AddTransition(new Transition("X", fillGridState).SetAction(new AddXAction(grid)));
         fillGridState.AddTransition(new Transition("O", fillGridState).SetAction(new AddOAction(grid)));
     }

@@ -9,24 +9,16 @@
 ## Structure
 
 All states have common features
-- Some methods `AddTransition`, `OverwriteTransition` and `AddTransitions` to add transitions from this state to an other state.
-- A method `SetDefault` to set the default state to return when no transitions are valid.
+- Two methods `AddTransition` and `OverwriteTransition` to add transitions from this state to an other state.
+- A method `SetDefault` to set the default transition used when no transitions are valid.
 - A method `SetAction` to set the action linked to the state.
 - Two methods `Activate` and `Deactivate` to control the state's activity.
 - Two events `OnReached` and `OnLeft` triggerred when the state is reached or left.
-- A method `Read(IAutomatonToken token)` where token is the token to read
+- A method `Read` to read a token and take a transition to the next state
 
 The complete API description is available below.
 
 ## Methods
-
-### void Activate()
-
-Activate the state. When an action is linked to a state, this method performs the action.
-
-### void Deactivate()
-
-Deactivate the state.
 
 ### void AddTransition(ITransition\<T\> transition)
 
@@ -36,27 +28,11 @@ Add a transition to the list of transitions. If a transition with the same token
 
 Same as `AddTransition` but overwrites the existing transition if one with the same token already exists.
 
-### void AddTransitions(ICollection\<ITransition\<T\>\> transitions)
+### IState\<T\> SetDefault(ITransition\<T\> transition)
 
-Add multiple transitions to the list of transitions.
-
-### IState\<T\> SetDefault(IState\<T\> state)
-
-Set a state to transfer to when no transitions are valid.
+Set a transition to use when no transitions are valid.
 
 Returns: The current state.
-
-### IState\<T\> SetDefault(IState\<T\> state, ITokenAction action)
-
-Set a state and an action to perform when no transitions are valid.
-
-Returns: The current state.
-
-### IState\<T\> Read(IAutomatonToken\<T\> token)
-
-Read a token and return the target state of the first matching transition, or the default one if there is no such transition.
-
-Returns: The target state of the transition, or the default one if there is no such transition.
 
 ### IActionState\<T\> SetAction(ITokenAction\<T\> action)
 
@@ -77,6 +53,20 @@ Returns: A new state with the final flag set.
 This method is only available on final states. It sets a condition to check when the state is reached. If the condition returns false, the state is not considered as reached.
 
 Returns: The current final state.
+
+### void Activate()
+
+Activate the state. When an action is linked to a state, this method performs the action.
+
+### void Deactivate()
+
+Deactivate the state.
+
+### IState\<T\> Read(IAutomatonToken\<T\> token)
+
+Read a token and return the target state of the first matching transition, or the default one if there is no such transition.
+
+Returns: The target state of the transition, or the default one if there is no such transition.
 
 ## Events
 

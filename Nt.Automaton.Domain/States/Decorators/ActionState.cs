@@ -6,6 +6,11 @@ namespace Nt.Automaton.States.Decorators
 {
     public class ActionState<T> : IActionState<T>
     {
+        public event EventHandler? Activated;
+        public event EventHandler? Deactivated;
+        public event EventHandler<StateEventArgs<T>>? Reach;
+        public event EventHandler<StateEventArgs<T>>? Leave;
+
         private IState<T> State { get; }
 
         public IAction Action { get; private set; }
@@ -19,8 +24,7 @@ namespace Nt.Automaton.States.Decorators
             State.Reach += (sender, args) => { OnReach(args); };
         }
 
-        public IState<T> SetDefault(IState<T> defaultState) => State.SetDefault(defaultState);
-        public IState<T> SetDefault(IState<T> defaultState, ITokenAction<T> defaultAction) => State.SetDefault(defaultState, defaultAction);
+        public IState<T> SetDefault(ITransition<T> transition) => State.SetDefault(transition);
         public IActionState<T> SetAction(IAction action)
         {
             Action = action;
@@ -30,7 +34,6 @@ namespace Nt.Automaton.States.Decorators
 
         public void AddTransition(ITransition<T> transition) => State.AddTransition(transition);
         public void OverwriteTransition(ITransition<T> transition) => State.OverwriteTransition(transition);
-        public void AddTransitions(ICollection<ITransition<T>> transitions) => State.AddTransitions(transitions);
 
         public IState<T> Read(IAutomatonToken<T> token) => State.Read(token);
 
@@ -58,10 +61,5 @@ namespace Nt.Automaton.States.Decorators
             State.Deactivate();
             Deactivated?.Invoke(this, EventArgs.Empty);
         }
-
-        public event EventHandler? Activated;
-        public event EventHandler? Deactivated;
-        public event EventHandler<StateEventArgs<T>>? Reach;
-        public event EventHandler<StateEventArgs<T>>? Leave;
     }
 }

@@ -10,19 +10,11 @@ namespace Nt.Automaton.States
         bool IsFinal { get; }
 
         /// <summary>
-        /// Sets the default state for this instance.
+        /// Sets the default transition for this state. The default transition is used when no other transitions match the input token.
         /// </summary>
-        /// <param name="defaultState">The state to use as the default.</param>
-        /// <returns>The current instance with the default state set.</returns>
-        IState<T> SetDefault(IState<T> defaultState);
-
-        /// <summary>
-        /// Sets the default state and action for this instance.
-        /// </summary>
-        /// <param name="defaultState">The state to use as the default.</param>
-        /// <param name="defaultAction">The action to use as the default.</param>
-        /// <returns>The current instance with the updated default state and action.</returns>
-        IState<T> SetDefault(IState<T> defaultState, ITokenAction<T> defaultAction);
+        /// <param name="transition">The transition to use as the default.</param>
+        /// <returns>The current instance with the default transition set.</returns>
+        IState<T> SetDefault(ITransition<T> transition);
 
         /// <summary>
         /// Adds a transition from this state to an other one.
@@ -35,12 +27,6 @@ namespace Nt.Automaton.States
         /// </summary>
         /// <param name="transition">The transition to add or overwrite in the collection.</param>
         void OverwriteTransition(ITransition<T> transition);
-
-        /// <summary>
-        /// Adds a collection of transitions, from this state to other states.
-        /// </summary>
-        /// <param name="transitions">A list of transitions to add.</param>
-        void AddTransitions(ICollection<ITransition<T>> transitions);
 
         /// <summary>
         /// Reads a token and gets the next state

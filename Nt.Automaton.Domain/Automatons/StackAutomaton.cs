@@ -44,7 +44,7 @@ namespace Nt.Automaton.Automatons
                 CurrentState.Leave += Push;
                 CurrentState.Read(token);
             }
-            catch (NoDefaultStateException)
+            catch (NoDefaultTransitionException)
             {
                 CurrentState.Leave -= Push;
                 Pop();

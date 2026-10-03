@@ -1,5 +1,6 @@
 ﻿using Nt.Automaton.Automatons;
 using Nt.Automaton.States;
+using Nt.Automaton.Transitions;
 using Nt.Tests.Automaton.Automatons.Instances;
 
 using static Nt.Tests.Automaton.Automatons.AutomatonUtils;
@@ -116,7 +117,7 @@ namespace Nt.Tests.Automaton.Automatons
             IState<string> state2 = new State<string>().SetAction(action);
             IState<string> state3 = new State<string>().SetAction(action);
             IState<string> state4 = new State<string>().SetAction(action);
-            state4.SetDefault(state4);
+            state4.SetDefault(new Transition<string>(state4));
             StateSequence(initial, [(state1, "a"), (state2, "b"), (state3, "c"), (state4, "d")]);
 
             var automaton = new StackAutomaton<string>().SetAutoPerformAction();

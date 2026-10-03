@@ -1,5 +1,6 @@
 ﻿using Nt.Automaton.Automatons;
 using Nt.Automaton.States;
+using Nt.Automaton.Transitions;
 using Nt.Tests.Automaton.Automatons.Instances;
 
 using static Nt.Tests.Automaton.Automatons.AutomatonUtils;
@@ -95,7 +96,7 @@ namespace Nt.Tests.Automaton.Automatons
         public void StateAutomaton_DefaultTransition_ValidState()
         {
             State<string> initial = new(), state1 = new();
-            initial.SetDefault(state1);
+            initial.SetDefault(new Transition<string>(state1));
 
             var automaton = new StateAutomaton<string>(initial);
             Read(automaton, ["a"]);
@@ -109,7 +110,7 @@ namespace Nt.Tests.Automaton.Automatons
             var action = new IncrementAction();
             IState<string> initial = new State<string>();
             IState<string> state1 = new State<string>().SetAction(action);
-            initial.SetDefault(state1);
+            initial.SetDefault(new Transition<string>(state1));
 
             var automaton = new StateAutomaton<string>(initial);
             Read(automaton, ["a"]);
@@ -122,7 +123,7 @@ namespace Nt.Tests.Automaton.Automatons
         {
             var action = new IncrementAction();
             State<string> initial = new(), state1 = new();
-            initial.SetDefault(state1, action);
+            initial.SetDefault(new Transition<string>(state1).SetAction(action));
 
             var automaton = new StateAutomaton<string>(initial);
             Read(automaton, ["a"]);

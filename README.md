@@ -5,7 +5,7 @@
 - [Using an automaton](#using-an-automaton)
 	- [Creating a token](#creating-a-token)	 
 	- [Defining actions](#defining-actions)
-	- [Creating states and transition](#creating-states-and-transitions)
+	- [Creating states and transitions](#creating-states-and-transitions)
 - [Customising the automaton](#customising-the-automaton)
 	- [Custom states](#custom-states)
 	- [Custom transitions](#custom-transitions)
@@ -103,10 +103,10 @@ var stateA = new State();
 var stateB = new State().SetAction(new MyAction(), true);
 
 // Add a default state to transfer to when no transition is valid
-stateA.SetDefault(stateB);
+stateA.SetDefault(new Transition(stateB));
 
 // Add a default state with an action to trigger when transferring to the default state
-stateB.SetDefault(stateA, action);
+stateB.SetDefault(new Transition(stateA).SetAction(action));
 
 // Add a transition from stateA to stateB when the token read is "B"
 stateA.AddTransition(new Transition(tokenB, stateB)));

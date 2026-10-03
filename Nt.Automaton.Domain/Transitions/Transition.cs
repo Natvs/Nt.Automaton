@@ -12,10 +12,22 @@ namespace Nt.Automaton.Transitions
     /// <typeparam name="T"></typeparam>
     /// <param name="value">The value that triggers the transition</param>
     /// <param name="newState">The state to which the transition leads when the specified value is read</param>
-    public class Transition<T>(IAutomatonToken<T> value, IState<T> newState) : ITransition<T>
+    public class Transition<T> : ITransition<T>
     {
-        public IAutomatonToken<T> Token { get; } = value;
-        public IState<T> Target { get; } = newState;
+        public Transition(IState<T> newState)
+        {
+            Token = new AutomatonToken<T>(default!);
+            Target = newState;
+        }
+
+        public Transition(IAutomatonToken<T> value, IState<T> newState)
+        {
+            Token = value;
+            Target = newState;
+        }
+
+        public IAutomatonToken<T> Token { get; }
+        public IState<T> Target { get; }
 
         public bool Accepts(IAutomatonToken<T> token)
         {
