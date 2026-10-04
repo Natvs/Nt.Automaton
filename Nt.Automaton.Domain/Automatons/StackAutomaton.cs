@@ -1,9 +1,8 @@
 ﻿using Nt.Automaton.Automatons.Exceptions;
+using Nt.Automaton.Events;
 using Nt.Automaton.States;
 using Nt.Automaton.States.Exceptions;
 using Nt.Automaton.Tokens;
-using Nt.Automaton.Transitions;
-using System.Reflection;
 
 namespace Nt.Automaton.Automatons
 {
@@ -16,7 +15,10 @@ namespace Nt.Automaton.Automatons
 
         public IState<T>? CurrentState { get; private set; }
         private Stack<IState<T>> Stack { get; } = new();
+        public bool IsValid => IsEmpty;
+        public bool IsEmpty => CurrentState == null && Stack.Count == 0;
 
+        public event EventHandler<StateEventArgs<T>>? FinalStateReached;
         public event EventHandler? StatePushed;
         public event EventHandler? StatePopped;
 
@@ -47,9 +49,10 @@ namespace Nt.Automaton.Automatons
                 CurrentState.Deactivate();
                 Pop();
                 CurrentState.Activate();
+                FinalStateReached?.Invoke(this, new StateEventArgs<T>(CurrentState));
             }
         }
-        private void Push(object? sender, StateEventArgs<T> e)
+        private void Push(object? sender, TransitionEventArgs<T> e)
         {
             var state = (IState<T>)sender!;
 
@@ -69,11 +72,6 @@ namespace Nt.Automaton.Automatons
             else CurrentState = null;
             StatePopped?.Invoke(this, EventArgs.Empty);
         }
-        public bool IsEmpty()
-        {
-            return Stack.Count == 0 && CurrentState == null;
-        }
-
 
     }
 

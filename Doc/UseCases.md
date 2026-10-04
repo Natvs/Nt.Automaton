@@ -300,7 +300,8 @@ class ConfigurationService(Configuration config) {
 
         // Iterate until the user escapes from the initial state
         Automaton.Push(initialState);
-        while (!Automaton.IsEmpty()) {
+        initialState.Activate()
+        while (!Automaton.IsEmpty) {
             var answer = (int)Console.Readline();
             Automaton.Read(new AutomatonToken(answer));
         }

@@ -3,14 +3,14 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Nt.Automaton.Transitions
+namespace Nt.Automaton.Events
 {
-    public class TransitionEventsArgs<T> : EventArgs
+    public class TokenEventArgs<T> : EventArgs
     {
 
         public IAutomatonToken<T> Token { get; }
 
-        public TransitionEventsArgs(IAutomatonToken<T> token)
+        public TokenEventArgs(IAutomatonToken<T> token)
         {
             Token = token;
         }

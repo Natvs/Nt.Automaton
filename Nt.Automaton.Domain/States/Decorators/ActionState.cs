@@ -1,4 +1,5 @@
 ﻿using Nt.Automaton.Actions;
+using Nt.Automaton.Events;
 using Nt.Automaton.Tokens;
 using Nt.Automaton.Transitions;
 
@@ -8,8 +9,8 @@ namespace Nt.Automaton.States.Decorators
     {
         public event EventHandler? Activated;
         public event EventHandler? Deactivated;
-        public event EventHandler<StateEventArgs<T>>? Reach;
-        public event EventHandler<StateEventArgs<T>>? Leave;
+        public event EventHandler<TransitionEventArgs<T>>? Reach;
+        public event EventHandler<TransitionEventArgs<T>>? Leave;
 
         private IState<T> State { get; }
 
@@ -39,12 +40,12 @@ namespace Nt.Automaton.States.Decorators
 
         // Events
 
-        public void OnReach(StateEventArgs<T> args)
+        public void OnReach(TransitionEventArgs<T> args)
         {
             Reach?.Invoke(this, args);
             Activate();
         }
-        public void OnLeave(StateEventArgs<T> args)
+        public void OnLeave(TransitionEventArgs<T> args)
         {
             Deactivate();
             Leave?.Invoke(this, args);

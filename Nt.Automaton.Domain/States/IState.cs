@@ -1,4 +1,5 @@
 ﻿using Nt.Automaton.Actions;
+using Nt.Automaton.Events;
 using Nt.Automaton.States.Decorators;
 using Nt.Automaton.Tokens;
 using Nt.Automaton.Transitions;
@@ -67,12 +68,12 @@ namespace Nt.Automaton.States
         /// Triggers the <see cref="Reach"/> event
         /// </summary>
         /// <param name="args">Event arguments</param>
-        void OnReach(StateEventArgs<T> args);
+        void OnReach(TransitionEventArgs<T> args);
         /// <summary>
         /// Triggers the <see cref="Leave"/> event
         /// </summary>
         /// <param name="args"></param>
-        void OnLeave(StateEventArgs<T> args);
+        void OnLeave(TransitionEventArgs<T> args);
 
         /// <summary>
         /// Event triggered when this state is activated.
@@ -86,12 +87,12 @@ namespace Nt.Automaton.States
         /// <summary>
         /// Event triggered after a transition that targets this state is taken.
         /// </summary>
-        event EventHandler<StateEventArgs<T>>? Reach;
+        event EventHandler<TransitionEventArgs<T>>? Reach;
 
         /// <summary>
         /// Event triggered before a transition that departs from this state is taken.
         /// </summary>
-        event EventHandler<StateEventArgs<T>>? Leave;
+        event EventHandler<TransitionEventArgs<T>>? Leave;
 
 
     }

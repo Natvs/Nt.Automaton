@@ -45,8 +45,8 @@ sf --> [*]
 
 |Name|Type|Description|
 |----|----|-----------|
-|InitialState|IState|The initial state, set in the constructor of the automaton|
 |CurrentState|IState|The current state of the automaton|
+|IsValid|bool|Indicate whether the automaton is in a valid state (i.e., has reached a final state)|
 
 **Constructors**
 
@@ -59,6 +59,12 @@ sf --> [*]
 |Name|Parameters|Return Type|Description|
 |----|----------|-----------|-----------|
 |Read(IAutomatonToken token)|token to read|void|Process the given token and updates the current state accordingly.|
+
+**Events**
+
+|Name|Arguments|Description|
+|----|----------|-----------|
+|FinalStateReached|the final state reached|This event is triggered when the automaton reaches a final state|
 
 ### Stack Automaton
 ---
@@ -116,7 +122,9 @@ s3 --> [*]
 
 |Name|Type|Description|
 |----|----|-----------|
-|CurrentState|IState|The current state of the automaton.|IsFinal|B|
+|CurrentState|IState|The current state of the automaton.|
+|IsEmpty|bool|Indicate whether the automaton is empty (i.e., has no state in the stack).|
+|IsValid|bool|Indicate whether the automaton is in a valid state (same as IsEmpty).|
 
 **Constructors and build methods**
 
@@ -130,13 +138,13 @@ s3 --> [*]
 |----|----------|-----------|-----------|
 |Read(IAutomatonToken token)|token to read|void|Process the given token, goes to the new state and push it on the stack|
 |Push(IState newState)|State to push|void|Push a new state on the stack. If it is a final node, automatically pops it after pushing it.|
-|Pop()|No arguments|void|Pop the last state from the stack|
-|IsEmpty()||bool|Boolean value defining if there are still states in the stack|
+|Pop()||void|Pop the last state from the stack|
 
 **Events**
 
-|Name|Parameters|Description|
+|Name|Arguments|Description|
 |----|----------|-----------|
+|FinalStateReached|the final state reached|This event is triggered when the automaton reaches a final state|
 |StatePushed||This event is triggered after a state is pushed onto the stack|
 |StatePopped||This event is triggered after a state is popped from the stack|
 

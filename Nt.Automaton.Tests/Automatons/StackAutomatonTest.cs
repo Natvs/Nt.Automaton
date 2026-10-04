@@ -1,5 +1,6 @@
 ﻿using Nt.Automaton.Automatons;
 using Nt.Automaton.States;
+using Nt.Automaton.Tokens;
 using Nt.Automaton.Transitions;
 using Nt.Tests.Automaton.Automatons.Instances;
 
@@ -135,6 +136,22 @@ namespace Nt.Tests.Automaton.Automatons
         // Transition Actions
 
         [Fact]
+        public void StackAutomaton_FinalState_RaiseEventWhenFinalStateReached()
+        {
+            var initial = new State<string>();
+            var final = new State<string>().SetFinal();
+            initial.AddTransition(new Transition<string>(new AutomatonToken<string>("a"), final));
+
+            var automaton = new StackAutomaton<string>();
+            automaton.Push(initial);
+            bool eventRaised = false;
+            automaton.FinalStateReached += (sender, e) => eventRaised = true;
+            Read(automaton, ["a"]);
+
+            Assert.True(eventRaised);
+        }
+
+        [Fact]
         public void StackAutomaton_SingleTransition_ValidTransitionAction()
         {
             var action = new IncrementAction();
@@ -185,7 +202,7 @@ namespace Nt.Tests.Automaton.Automatons
             Assert.Equal(4, action.Count);
         }
 
-        // Final states
+        // Final States
 
         [Fact]
         public void StackAutomaton_FinalTransition_ShouldGoBack()

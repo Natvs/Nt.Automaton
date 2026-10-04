@@ -1,4 +1,5 @@
 ﻿using Nt.Automaton.Actions;
+using Nt.Automaton.Events;
 using Nt.Automaton.States.Decorators;
 using Nt.Automaton.States.Exceptions;
 using Nt.Automaton.Tokens;
@@ -66,7 +67,7 @@ namespace Nt.Automaton.States
 
         protected virtual IState<T> TargetNewState(ITransition<T> transition, IAutomatonToken<T> token)
         {
-            var args = new StateEventArgs<T>(transition);
+            var args = new TransitionEventArgs<T>(transition);
 
             // Leaves the current state then performs the transition action
             OnLeave(args);
@@ -86,12 +87,12 @@ namespace Nt.Automaton.States
         {
             Deactivated?.Invoke(this, new EventArgs());
         }
-        public void OnReach(StateEventArgs<T> args)
+        public void OnReach(TransitionEventArgs<T> args)
         {
             Reach?.Invoke(this, args);
             Activate();
         }
-        public void OnLeave(StateEventArgs<T> args)
+        public void OnLeave(TransitionEventArgs<T> args)
         {
             Deactivate();
             Leave?.Invoke(this, args);
@@ -99,8 +100,8 @@ namespace Nt.Automaton.States
 
         public event EventHandler? Activated;
         public event EventHandler? Deactivated;
-        public event EventHandler<StateEventArgs<T>>? Reach;
-        public event EventHandler<StateEventArgs<T>>? Leave;
+        public event EventHandler<TransitionEventArgs<T>>? Reach;
+        public event EventHandler<TransitionEventArgs<T>>? Leave;
     }
 
 }

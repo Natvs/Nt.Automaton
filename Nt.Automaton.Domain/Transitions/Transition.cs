@@ -1,4 +1,5 @@
 ﻿using Nt.Automaton.Actions;
+using Nt.Automaton.Events;
 using Nt.Automaton.States;
 using Nt.Automaton.Tokens;
 using Nt.Automaton.Transitions.Decorators;
@@ -42,10 +43,10 @@ namespace Nt.Automaton.Transitions
 
         public void Trigger(IAutomatonToken<T> token) 
         {
-            Triggered?.Invoke(this, new TransitionEventsArgs<T>(token));
+            Triggered?.Invoke(this, new TokenEventArgs<T>(token));
         }
 
-        public event EventHandler<TransitionEventsArgs<T>>? Triggered;
+        public event EventHandler<TokenEventArgs<T>>? Triggered;
     }
 
 }

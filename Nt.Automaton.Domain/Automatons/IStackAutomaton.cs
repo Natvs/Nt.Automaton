@@ -5,6 +5,10 @@ namespace Nt.Automaton.Automatons
 {
     public interface IStackAutomaton<T>: IAutomaton<T>
     {
+        /// <summary>
+        /// Determine whether the stack is empty.
+        /// </summary>
+        bool IsEmpty { get; }
 
         /// <summary>
         /// Occur after a state is removed from the stack.
@@ -15,12 +19,6 @@ namespace Nt.Automaton.Automatons
         /// Occur after a state is pushed onto the stack.
         /// </summary>
         event EventHandler? StatePushed;
-
-        /// <summary>
-        /// Determine whether the stack contains no elements.
-        /// </summary>
-        /// <returns>true if the stack is empty; otherwise, false.</returns>
-        bool IsEmpty();
 
         /// <summary>
         /// Pop the last state from the stack and goes back to it.

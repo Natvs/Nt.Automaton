@@ -1,4 +1,5 @@
-﻿using Nt.Automaton.States;
+﻿using Nt.Automaton.Events;
+using Nt.Automaton.States;
 using Nt.Automaton.Tokens;
 
 namespace Nt.Automaton.Automatons
@@ -6,9 +7,19 @@ namespace Nt.Automaton.Automatons
     public interface IAutomaton<T>
     {
         /// <summary>
-        /// Gets the current state of the automaton.
+        /// Get the current state of the automaton.
         /// </summary>
         IState<T>? CurrentState { get; }
+        /// <summary>
+        /// Indicate whether the automaton is in a valid state (i.e., has reached a final state).
+        /// </summary>
+        bool IsValid { get; }
+
+
+        /// <summary>
+        /// Occur when the automaton reaches a final state.
+        /// </summary>
+        event EventHandler<StateEventArgs<T>>? FinalStateReached;
 
         /// <summary>
         /// Read a token from the current state and goes to the next state.

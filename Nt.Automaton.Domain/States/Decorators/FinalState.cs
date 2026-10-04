@@ -1,4 +1,5 @@
 ﻿using Nt.Automaton.Actions;
+using Nt.Automaton.Events;
 using Nt.Automaton.Tokens;
 using Nt.Automaton.Transitions;
 
@@ -11,8 +12,8 @@ namespace Nt.Automaton.States.Decorators
 
         public event EventHandler? Activated;
         public event EventHandler? Deactivated;
-        public event EventHandler<StateEventArgs<T>>? Reach;
-        public event EventHandler<StateEventArgs<T>>? Leave;
+        public event EventHandler<TransitionEventArgs<T>>? Reach;
+        public event EventHandler<TransitionEventArgs<T>>? Leave;
 
         public bool IsFinal => Condition();
 
@@ -52,9 +53,9 @@ namespace Nt.Automaton.States.Decorators
 
         public void Deactivate() => State.Deactivate();
 
-        public void OnReach(StateEventArgs<T> args) => State.OnReach(args);
+        public void OnReach(TransitionEventArgs<T> args) => State.OnReach(args);
 
-        public void OnLeave(StateEventArgs<T> args) => State.OnLeave(args);
+        public void OnLeave(TransitionEventArgs<T> args) => State.OnLeave(args);
 
     }
 }
