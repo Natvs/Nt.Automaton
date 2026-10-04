@@ -1,6 +1,3 @@
-# This workflow will build a .NET project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
-
 name: .NET
 on:
   push:
@@ -9,9 +6,9 @@ on:
     branches: [ "master" ]
 
 env:
-  PROJECT_PATH: Nt.Automaton.Domain
-  PROJECT_FILE: Nt.Automaton.Domain.csproj
-  SBOM_DIR: Nt.Automaton.Domain/tmp                   
+  PROJECT_PATH: "Nt.Automaton.Domain"
+  PROJECT_FILE: "Nt.Automaton.Domain.csproj"
+  SBOM_DIR: "Nt.Automaton.Domain/tmp"                   
   SBOM_ARTIFACT: sbom.json
   GH_TOKEN: ${{github.token}}
 
@@ -33,7 +30,6 @@ jobs:
         run: dotnet test --no-build --verbosity normal
     
   generate-sbom:
-    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout solution
@@ -50,22 +46,67 @@ jobs:
           name: ${{env.SBOM_ARTIFACT}}
           path: ${{env.SBOM_DIR}}
 
+  check-nuget:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Retrieve version
+        id: version
+        run: |
+          cd ${{env.PROJECT_PATH}}  
+          VERSION=$(dotnet msbuild ${{env.PROJECT_FILE}} -getProperty:PackageVersion)
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+      - name: Check package
+        id: check
+        shell: pwsh
+        run: |
+          $obj = gh api "/users/natvs/packages/nuget/Nt.Automaton/versions" | ConvertFrom-Json
+          $version = ${{steps.version.outputs.version}}
+          if (obj.name | Select-String $version) {
+            echo "create=false" >> "$GITHUB_OUTPUT"
+            echo "Package for version $version already exists. No additional to create." 
+          } else {
+            echo "create=true" >> "$GITHUB_OUTPUT"
+            echo "Package for version $version inexistant. A new package will be created."
+          }
+    outputs:
+      create-package: ${{steps.check.outputs.create}}
+
   # This job requires a secret token PACKAGE_REPO_TOKEN with write access to the local package repository
   publish-nuget:
-    needs: build
-    if: github.event_name == 'push'
+    needs: 
+      - build
+      - check-nuget
+    if: github.event_name == 'push' && needs.check-nuget.outputs.create-package == 'true'
     runs-on: ubuntu-latest
+    env:
+      NUGET_REPO: https://nuget.pkg.github.com/Natvs/index.json
+      NUGET_USERNAME: Natvs
+      NUGET_PATH: "${{github.workspace}}/nuget"
     
     steps:
-      - name: Checkout solution
-        uses: actions/checkout@v7
-      - name: Publish nuget to local repository
-        uses: Rebel028/publish-nuget@v2.8.0
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
         with:
-          PROJECT_FILE_PATH: ${{env.PROJECT_PATH}}/${{env.PROJECT_FILE}}
-          NUGET_SOURCE: https://nuget.pkg.github.com/Natvs
-          NUGET_KEY: ${{secrets.PACKAGE_REPO_TOKEN}}
-          GITHUB_USER: Natvs
+          dotnet-version: 10.0.x
+      - name: Authenticate GitHub package source
+        run: |
+          dotnet nuget add source \
+          ${{ env.NUGET_REPO }} \
+            --name github \
+            --username ${{ env.NUGET_USERNAME }} \
+            --password ${{ secrets.PACKAGE_REPO_TOKEN }} \
+            --store-password-in-clear-text
+      - name: Pack
+        run: dotnet pack ${{ env.PROJECT_PATH }} --configuration Release --output ${{ env.NUGET_PATH }}
+      - name: Publish
+        shell: pwsh
+        run: |
+          Get-ChildItem -Path "${{ env.NUGET_PATH }}" -Filter "*.nupkg" | ForEach-Object {
+              dotnet nuget push $_.FullName --source "github" --skip-duplicate
+          }
 
   check-release:
     runs-on: ubuntu-latest
@@ -104,9 +145,10 @@ jobs:
 
   create-release:
     needs:
+      - build
       - check-release
       - generate-sbom
-    if: ${{needs.check-release.outputs.create-release == 'true'}}
+    if: needs.check-release.outputs.create-release == 'true'
     runs-on: ubuntu-latest
   
     steps:
