@@ -14,11 +14,6 @@ namespace Nt.Automaton.Automatons
         public IState<T> InitialState { get; } = initialState;
         public IState<T> CurrentState { get; private set; } = initialState;
 
-        /// <summary>
-        /// Read a token from the current state and goes to the next state.
-        /// </summary>
-        /// <param name="token">Automation token to read</param>
-        /// <exception cref="NullStateException">The current state may be null</exception>
         public void Read(IAutomatonToken<T> token)
         {
             if (CurrentState == null) { throw new NullStateException("Current state is null"); }
