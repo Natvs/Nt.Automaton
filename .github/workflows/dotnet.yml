@@ -63,7 +63,7 @@ jobs:
         run: |
           $obj = gh api "/users/natvs/packages/nuget/Nt.Automaton/versions" | ConvertFrom-Json
           $version = ${{steps.version.outputs.version}}
-          if (obj.name | Select-String $version) {
+          if ($obj.name | Select-String $version) {
             echo "create=false" >> "$GITHUB_OUTPUT"
             echo "Package for version $version already exists. No additional to create." 
           } else {
