@@ -209,8 +209,8 @@ using StackAutomaton = Nt.Automaton.Automatons.StackAutomaton<int>;
 // This is the first action triggered when the client opens the configuration edition service
 class BaseAction(StackAutomaton automaton): IAction {
     static void SetAutomaton(State parent, Automaton automaton, Config config) {
-        var enableState = new State().SetAction(new EnableAction(automaton, config), true);
-        var researchState = new State().SetAction(new ResearchAction(automaton), true);
+        var enableState = new State().SetAction(new EnableAction(automaton, config)).SetFinal();
+        var researchState = new State().SetAction(new ResearchAction(automaton));
 
         parent.AddTransition(new Transition(1, enableState));
         parent.AddTransition(new Transition(2, researchState));
@@ -229,8 +229,8 @@ class BaseAction(StackAutomaton automaton): IAction {
 // Once the client enters the "Configure reserach" from the previous action, this action is triggered
 class ResearchAction(StackAutomaton automaton): IAction {
     static void SetAutomaton(State parent, Automaton automaton, Config config) {
-        var iterationsState = new State().SetAction(new IterationsAction(automaton, config), true);
-        var modeState = new State().SetAction(new ModeAction(automaton, config), true);
+        var iterationsState = new State().SetAction(new IterationsAction(automaton, config)).SetFinal();
+        var modeState = new State().SetAction(new ModeAction(automaton, config)).SetFinal();
 
         parent.AddTransition(new Transition(1, iterationState));
         parent.AddTransition(new Transition(2, modeState));
@@ -255,8 +255,6 @@ class EnableAction(StackAutomaton automaton, Configuration config): IAction {
         var answer = Console.Readline;
         if (config == "1") config.Enabled = true;
         if (config == "2") config.Enabled = false;
-
-        automaton.Pop();
     }
 }
 
@@ -266,8 +264,6 @@ class IterationsAction(StackAutomaton automaton, Configuration config): IAction 
 
         var answer = Console.Readline();
         config.Iterations = (int)answer;
-
-        automaton.Pop();
     }
 }
 
@@ -286,8 +282,6 @@ class ModeAction(StackAutomaton automaton, Configuration config): IAction {
             "3" => Modes.HIGH,
             _ => config.Mode
         };
-
-        automaton.Pop();
     }
 }
 ```

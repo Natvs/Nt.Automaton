@@ -100,13 +100,16 @@ var action = new MyAction();
 var stateA = new State();
 
 // Create a new state with an action to trigger when entering the state
-var stateB = new State().SetAction(new MyAction(), true);
+var stateB = new State().SetAction(new MyAction());
+
+// Mark the state as a final node
+var stateC = new State().SetFinal();
 
 // Add a default state to transfer to when no transition is valid
 stateA.SetDefault(new Transition(stateB));
 
 // Add a default state with an action to trigger when transferring to the default state
-stateB.SetDefault(new Transition(stateA).SetAction(action));
+stateB.SetDefault(new Transition(stateC).SetAction(action));
 
 // Add a transition from stateA to stateB when the token read is "B"
 stateA.AddTransition(new Transition(tokenB, stateB)));
