@@ -2,16 +2,17 @@
 using Nt.Automaton.Tokens;
 using Nt.Automaton.Transitions;
 
-namespace Nt.Tests.Automaton.States
+namespace Nt.Tests.Automaton.States.Decorators
 {
-    public class StateTest
+    public class FinalStateTest
     {
+
         // Target states
 
         [Fact]
-        public void State_DefaultTransition_ValidState()
+        public void FinalState_DefaultTransition_ValidState()
         {
-            var initial = new State<string>();
+            var initial = new State<string>().SetFinal();
             initial.SetDefault(new Transition<string>(initial));
 
             var new_state = initial.Read(new AutomatonToken<string>("a"));
@@ -20,9 +21,9 @@ namespace Nt.Tests.Automaton.States
         }
 
         [Fact]
-        public void State_MultipleDefaultTransition_ValidState()
+        public void FinalState_MultipleDefaultTransition_ValidState()
         {
-            var initial = new State<string>();
+            var initial = new State<string>().SetFinal();
             initial.SetDefault(new Transition<string>(initial));
 
             IState<string> new_state = initial;
@@ -35,10 +36,10 @@ namespace Nt.Tests.Automaton.States
         }
 
         [Fact]
-        public void State_Transition_ValidState()
+        public void FinalState_Transition_ValidState()
         {
-            var initial = new State<string>();
-            var second = new State<string>();
+            var initial = new State<string>().SetFinal();
+            var second = new State<string>().SetFinal();
             var token = new AutomatonToken<string>("a");
             initial.AddTransition(new Transition<string>(token, second));
 
@@ -47,13 +48,40 @@ namespace Nt.Tests.Automaton.States
             Assert.Equal(second, new_state);
         }
 
+        // Final state
+
+        [Fact]
+        public void FinalState_IsFinal_ReturnsTrue()
+        {
+            var final_state = new State<string>().SetFinal();
+            Assert.True(final_state.IsFinal);
+        }
+
+        [Fact]
+        public void FinalState_IsFinal_ReturnsFalse()
+        {
+            var non_final_state = new State<string>();
+            Assert.False(non_final_state.IsFinal);
+        }
+
+        [Fact]
+        public void FinalState_IsFinal_ReturnsCondition()
+        {
+            bool condition_met = false;
+            var final_state = new State<string>().SetFinal().OnCondition(() => condition_met == true);
+
+            Assert.False(final_state.IsFinal);
+            condition_met = true;
+            Assert.True(final_state.IsFinal);
+        }
+
         // Events
 
         [Fact]
-        public void State_RaiseEvents_OnTransition()
+        public void FinalState_RaiseEvents_OnTransition()
         {
-            var initial = new State<string>();
-            var second = new State<string>();
+            var initial = new State<string>().SetFinal();
+            var second = new State<string>().SetFinal();
             var token = new AutomatonToken<string>("a");
             bool deactivated_raised = false, leave_raised = false, reach_raised = false, activated_raised = false;
 
@@ -71,10 +99,10 @@ namespace Nt.Tests.Automaton.States
         }
 
         [Fact]
-        public void State_RaiseEventsInRigthSequence_OnTransition()
+        public void FinalState_RaiseEventsInRigthSequence_OnTransition()
         {
-            var initial = new State<string>();
-            var second = new State<string>();
+            var initial = new State<string>().SetFinal();
+            var second = new State<string>().SetFinal();
             var token = new AutomatonToken<string>("a");
             int counter = 0;
             int deactivated = 0, leave = 0, reach = 0, activated = 0;
@@ -93,10 +121,10 @@ namespace Nt.Tests.Automaton.States
         }
 
         [Fact]
-        public void State_RaiseEvents_OnDefaultTransition()
+        public void FinalState_RaiseEvents_OnDefaultTransition()
         {
-            var initial = new State<string>();
-            var second = new State<string>();
+            var initial = new State<string>().SetFinal();
+            var second = new State<string>().SetFinal();
             var token = new AutomatonToken<string>("a");
             bool deactivated_raised = false, leave_raised = false, reach_raised = false, activated_raised = false;
 
@@ -114,10 +142,10 @@ namespace Nt.Tests.Automaton.States
         }
 
         [Fact]
-        public void State_RaiseEventsInRigthSequence_OnDefaultTransition()
+        public void FinalState_RaiseEventsInRigthSequence_OnDefaultTransition()
         {
-            var initial = new State<string>();
-            var second = new State<string>();
+            var initial = new State<string>().SetFinal();
+            var second = new State<string>().SetFinal();
             var token = new AutomatonToken<string>("a");
             int counter = 0;
             int deactivated = 0, leave = 0, reach = 0, activated = 0;

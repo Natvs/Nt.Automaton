@@ -1,126 +1,139 @@
 # States
 
-- [Common features of a state](#common-features-of-a-state)
-- [Different types of states](#different-type-of-states)
-	- [State](#state)
-	- [StillState](#stillstate)
+- [Structure](#structure)
+- [Methods](#methods)
+- [Events](#events)
+- [Workflow](#workflow)
+- [Customisable states](#customisable-states)
 
-## Common features of a state
+## Structure
 
 All states have common features
-- A field `Action` that describes an action linked to the state
-- A method `Read(IAutomatonToken token)` where token is the token to read
-- A method `AddTransition(ITransition transition)` to add transitions from this state
-- Two events `OnReached` and `OnLeft` to trigger when the state is reached or left.
+- Two methods `AddTransition` and `OverwriteTransition` to add transitions from this state to an other state.
+- A method `SetDefault` to set the default transition used when no transitions are valid.
+- A method `SetAction` to set the action linked to the state.
+- Two methods `Activate` and `Deactivate` to control the state's activity.
+- Two events `OnReached` and `OnLeft` triggerred when the state is reached or left.
+- A method `Read` to read a token and take a transition to the next state
 
-These features describes the interface `IState` that all states must implement. The difference between the different instances of states that exist is the interpretation of the fields, methods and events.
+The complete API description is available below.
 
-## Different type of states
+## Methods
 
-Here is a list of implemented states in this library:
-- [State](#state)
-- [StillState](#stillstate)
+### void AddTransition(ITransition\<T\> transition)
 
-### State
+Add a transition to the list of transitions. If a transition with the same token already exists, the already existing transition has priority over this one.
 
-The state `State` is a state that handles the associated action automatically when reading. You do not have to trigger the state manually.
+### void OverwriteTransition(ITransition\<T\> transition)
 
-It also has fields `DefaultState` and `DefaultAction` when the token is none of the registered transitions.
+Same as `AddTransition` but overwrites the existing transition if one with the same token already exists.
 
-**Fields**
-|Name|Type|Description|
-|----|----|-----------|
-|Action|IAction|The action to be executed when entering this state.|
-|Transitions|List<ITransition>|A list of transitions that can be taken from this state.|
-|DefaultState|IState|The state to transfer to when none of the above transitions are valid.|
-|DefaultAction|IAction|The action to be executed when transferring to the default state.|
+### IState\<T\> SetDefault(ITransition\<T\> transition)
 
-**Constructors**
-|Name|Parameters|Description|
-|----|----------|-----------|
-|State()| |Returns a new instance of State without action.|
-|State(IAction action)|action linked to the state|Returns a new instance of State with an action.|
+Set a transition to use when no transitions are valid.
 
-**Methods**
-|Name|Parameters|Return Type|Description|
-|----|----------|-----------|-----------|
-|SetDefault(IState state)|state to return when read if no transitions are valid|State|Set the default state to return when no transitions are valid.|
-|SetDefault(IState state, IAction action)|state and action to perform when read if no transitions are valid|State|Set the default state and actions when no transitions are valid.|
-|AddTransition(ITransition transitions)|transition to add|void|Adds a transition to the list of transitions.|
-|AddTransitions(ICollection<ITransition> transitions)|collection of transitions to add|void|Shortcut for adding multiple transitions.|
-|OverwriteTransition(ITransition transition)|transition to overwrite|void|Overwrites an existing transition in the list of transitions.|
-|Read(IAutomatonToken token)|token to read to take a transition|State|Returns the target state of the right transition, or the default one if there is no such transition.|
+Returns: The current state.
 
-**Events**
-|Name|Parameters|Description|
-|----|----------|-----------|
-|StateReached|StateEventsArgs e|Event triggered when a state is reached (after a transition).|
-|StateLeft|StateEventsArgs e|Event triggered when a state is left (before a transition).|
+### IActionState\<T\> SetAction(ITokenAction\<T\> action)
 
-**Rules for triggering actions and events**
+Set an action to perform when the state is reached. 
 
-All actions and events are performed when the method `Read(token)` is called.
+If auto_perform is true, the action is performed when the state is reached.
 
-When a token is read:
-- If a transition with the token read exists:
-	1. The event `StateLeft` of the current state is invoked.
-	2. The action `Action` associated to the transition is performed.
-	3. The event `StateReached` of the target is invoked.
-	4. The action `Action` of the target state is performed.
-- If no transitions with the token read exists:
-	1. The event `StateLeft` of the current state is invoked.
-	2. The action `DefaultAction` is performed.
-	3. The event `StateReached` of the default target state is invoked.
-	4. The action `Action` of the default target state is performed.
+Returns: A new new state with the action set.
 
-### StillState
+### IFinalState\<T\> SetFinal()
 
-The state `StillState` is a state that do not trigger the action linked to the state after a transition. You do have to perform the action manually.
+Set the state as a final state.
 
-It also has fields `DefaultState` and `DefaultAction` when the token is none of the registered transitions.
+Returns: A new state with the final flag set.
 
-**Fields**
-|Name|Type|Description|
-|----|----|-----------|
-|Action|IAction|The action to be executed when entering this state.|
-|Transitions|List<ITransition>|A list of transitions that can be taken from this state.|
-|DefaultState|IState|The state to transfer to when none of the above transitions are valid.|
-|DefaultAction|IAction|The action linked to transitions to the default state.|
+### IFinalState\<T\> OnCondition(Func\<bool\> condition)
 
-**Constructors**
-|Name|Parameters|Description|
-|----|----------|-----------|
-|StillState()| |Returns a new instance of StillState without action.|
-|StillState(IAction action)|action linked to the state|Returns a new instance of StillState with an action.|
+This method is only available on final states. It sets a condition to check when the state is reached. If the condition returns false, the state is not considered as reached.
 
-**Methods**
-|Name|Parameters|Return Type|Description|
-|----|----------|-----------|-----------|
-|SetDefault(IState state)|state to return when read if no transitions are valid|StillState|Set the default state to return when no transitions are valid.|
-|SetDefault(IState state, IAction action)|state and action to perform when read if no transitions are valid|StillState|Set the default state and actions when no transitions are valid.|
-|AddTransition(ITransition transitions)|transition to add|void|Adds a transition to the list of transitions.|
-|AddTransitions(ICollection<ITransition> transitions)|collection of transitions to add|void|Shortcut for adding multiple transitions.|
-|OverwriteTransition(ITransition transition)|transition to overwrite|void|Overwrites an existing transition in the list of transitions.|
-|Read(IAutomatonToken token)|token to read to take a transition|State|Returns the target state of the right transition, or the default one if there is no such transition.|
+Returns: The current final state.
 
-**Events**
-|Name|Parameters|Description|
-|----|----------|-----------|
-|StateReached|StateEventsArgs e|Event triggered when a state is reached (after a transition).|
-|StateLeft|StateEventsArgs e|Event triggered when a state is left (before a transition).|
+### void Activate()
 
-**Rules for triggering actions and events**
+Activate the state. When an action is linked to a state, this method performs the action.
 
-All actions and events are performed when the method `Read(token)` is called.
+### void Deactivate()
 
-When a token is read:
-- If a transition with the token read exists:
-	1. The event `StateLeft` of the current state is invoked.
-	2. The action `Action` associated to the transition is performed.
-	3. The event `StateReached` of the target is invoked.
-- If no transitions with the token read exists:
-	1. The event `StateLeft` of the current state is invoked.
-	2. The action `DefaultAction` is performed.
-	3. The event `StateReached` of the default target state is invoked.
+Deactivate the state.
 
-The action `Action` linked to the event is never triggered when reading. You have to execute it manually.
+### IState\<T\> Read(IAutomatonToken\<T\> token)
+
+Read a token and return the target state of the first matching transition, or the default one if there is no such transition.
+
+Returns: The target state of the transition, or the default one if there is no such transition.
+
+## Events
+
+### EventHandler? Activated
+
+Event triggered once the state is activated
+
+### EventHandler? Deactivated
+
+Event triggered once the state is deactivated
+
+### EventHandler\<StateEventArgs\<T\>\>? Leave
+
+Event triggered when a state is left (before a transition).
+
+### EventHandler\<StateEventArgs\<T\>\>? Reach
+
+Event triggered when a state is reached (after a transition).
+
+## Workflow
+
+When a token is read and a transition is found, the following methods are called in order:
+
+1. The `Deactivate` method of the current state is called.
+2. The event `Leave` is raised from the current state.
+3. The action linked to the transition is performed, if any.
+4. The event `Reach` is raised from the target state.
+5. The `Activate` method of the target state is called.
+
+When a token is read and no transition is found, the following methods are called in order:
+
+1. A runtime exception is thrown if no default state is set.
+2. The `Deactivate` method of the current state is called.
+3. The event `Leave` is raised from the current state.
+4. The default action is performed, if any.
+5. The event `Reach` is raised from the default state.
+6. The `Activate` method of the default state is called.
+
+
+## Customisable states
+
+In addition to the existing states, you can override the default behavior by implementing the `Nt.Automaton.States.State` class, or create a new state from scratch by implementing the `Nt.Automaton.States.IState` interface.
+
+Example:
+
+```csharp
+using Nt.Automaton.States;
+using Nt.Automaton.Actions;
+
+# This state lets you define an action triggered when leaving the state
+public class MyState<T> : State<T>
+{
+	private Action { get; set; }
+	
+	public MyState() : base() { }
+
+	public override IState<T> SetAction(ITokenAction<T> action)
+	{
+		Action = action;
+		return this;
+	}
+
+	public override void Deactivate()
+	{
+		Action?.Perform();
+		base.Deactivate();
+	}
+}
+
+```

@@ -11,8 +11,9 @@ on:
 env:
   PROJECT_PATH: Nt.Automaton.Domain
   PROJECT_FILE: Nt.Automaton.Domain.csproj
-  SBOM_DIR: Nt.Automaton.Domain/tmp
+  SBOM_DIR: Nt.Automaton.Domain/tmp                   
   SBOM_ARTIFACT: sbom.json
+  GH_TOKEN: ${{github.token}}
 
 jobs:
   build:
@@ -65,7 +66,7 @@ jobs:
           NUGET_SOURCE: https://nuget.pkg.github.com/Natvs
           NUGET_KEY: ${{secrets.PACKAGE_REPO_TOKEN}}
           GITHUB_USER: Natvs
-  
+
   check-release:
     runs-on: ubuntu-latest
 

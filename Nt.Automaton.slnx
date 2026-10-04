@@ -4,6 +4,7 @@
     <File Path="Doc/States.md" />
     <File Path="Doc/Transitions.md" />
     <File Path="Doc/UseCases.md" />
+    <File Path="README.md" />
   </Folder>
   <Folder Name="/Solution files/">
     <File Path=".gitattributes" />

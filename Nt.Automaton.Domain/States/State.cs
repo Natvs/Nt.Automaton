@@ -1,7 +1,10 @@
 ﻿using Nt.Automaton.Actions;
+using Nt.Automaton.Events;
+using Nt.Automaton.States.Decorators;
 using Nt.Automaton.States.Exceptions;
 using Nt.Automaton.Tokens;
 using Nt.Automaton.Transitions;
+using System.Diagnostics;
 using System.Transactions;
 
 namespace Nt.Automaton.States
@@ -10,68 +13,37 @@ namespace Nt.Automaton.States
     /// <summary>
     /// Represents a state within a finite state machine, including its transitions, actions, and default behavior.
     /// </summary>
-    public class State<T> : IState<T>
+    public class State<T>() : IState<T>
     {
         public List<ITransition<T>> Transitions { get; } = [];
-        public IState<T>? DefaultState { get; private set; }
-        public ITokenAction<T>? DefaulAction { get; private set; }
-        public IAction? Action { get; }
+        public ITransition<T>? DefaultTransition { get; private set; }
+        public bool IsFinal { get => false; }
 
-        /// <summary>
-        /// Initializes a new instance of the State class.
-        /// </summary>
-        public State() { }
-
-        /// <summary>
-        /// Initializes a new instance of the State class with the specified action.
-        /// </summary>
-        /// <param name="action">The action to associate with this state.</param>
-        public State(IAction action)
+        public IState<T> SetDefault(ITransition<T> transition)
         {
-            Action = action;
-        }
-
-        /// <summary>
-        /// Sets the default state for this instance.
-        /// </summary>
-        /// <param name="defaultState">The state to use as the default.</param>
-        /// <returns>The current instance with the default state set.</returns>
-        public State<T> SetDefault(IState<T> defaultState)
-        {
-            DefaultState = defaultState;
-            return this;
-        }     
-        /// <summary>
-        /// Sets the default state and action for this instance.
-        /// </summary>
-        /// <param name="defaultState">The state to use as the default.</param>
-        /// <param name="defaultAction">The action to use as the default.</param>
-        /// <returns>The current instance with the updated default state and action.</returns>
-        public State<T> SetDefault(IState<T> defaultState, ITokenAction<T> defaultAction)
-        {
-            DefaultState = defaultState;
-            DefaulAction = defaultAction;
+            DefaultTransition = transition;
             return this;
         }
+        public IActionState<T> SetAction(IAction action)
+        {
+            return new ActionState<T>(this, action);
+        }
 
-        /// <summary>
-        /// Adds a transition from this state to an other one.
-        /// </summary>
-        /// <param name="transition">The transition to add.</param>
+        public IFinalState<T> SetFinal()
+        {
+            return new FinalState<T>(this);
+        }
+
         public void AddTransition(ITransition<T> transition)
         {
             Transitions.Add(transition);
         }
-        /// <summary>
-        /// Replaces any existing transition with the same value by the new transition.
-        /// </summary>
-        /// <param name="transition">The transition to add or overwrite in the collection.</param>
         public void OverwriteTransition(ITransition<T> transition)
         {
             List<ITransition<T>> toRemove = [];
             foreach (var t in Transitions)
             {
-                if (t.Value != null && t.Value.Equals(transition.Value)) toRemove.Add(t);
+                if (t.Accepts(transition.Token)) toRemove.Add(t);
             }
             foreach (var t in toRemove)
             {
@@ -79,88 +51,57 @@ namespace Nt.Automaton.States
             }
             Transitions.Add(transition);
         }
-        /// <summary>
-        /// Adds a collection of transitions, from this state to other states.
-        /// </summary>
-        /// <param name="transitions">A list of transitions to add.</param>
-        public void AddTransitions(ICollection<ITransition<T>> transitions)
-        {
-            foreach (var transition in transitions)
-            {
-                Transitions.Add(transition);
-            }
-        }
 
-        /// <summary>
-        /// Reads a token and gets the next state
-        /// </summary>
-        /// <param name="token">Automaton token to read</param>
-        /// <returns>Next state of the automaton after reading the token</returns>
-        /// <remarks>In case of multiple transitions with same symbol, only the first action added will be performed</remarks>
-        /// <exception cref="NoDefaultStateException">It might be that no default state was set for this state</exception>
         public IState<T> Read(IAutomatonToken<T> token)
         {
             foreach (var transition in Transitions)
             {
-                if (transition.Value == null) throw new NullTransitionTokenValue();
-                if (transition.Value.Equals(token.Value))
+                if (transition.Accepts(token))
                 {
                     return TargetNewState(transition, token);
                 }
             }
-            return TargetDefaultState(token);
+            if (DefaultTransition is null) throw new NoDefaultTransitionException();
+            return TargetNewState(DefaultTransition, token);
         }
 
-        private IState<T> TargetNewState(ITransition<T> transition, IAutomatonToken<T> token)
+        protected virtual IState<T> TargetNewState(ITransition<T> transition, IAutomatonToken<T> token)
         {
-            var args = new StateEventArgs<T>(transition);
+            var args = new TransitionEventArgs<T>(transition);
 
             // Leaves the current state then performs the transition action
-            OnLeft(args);
-            transition.Action?.Perform(token);
+            OnLeave(args);
+            transition.Trigger(token);
 
-            // Enters the new state and performs its action
-            transition.Target.OnReached(args);
-            transition.Target.Action?.Perform();
+            // Enters the new state
+            transition.Target.OnReach(args);
 
             return transition.Target;
         }
 
-        private IState<T> TargetDefaultState(IAutomatonToken<T> token)
+        public void Activate() 
         {
-            if (DefaultState == null) throw new NoDefaultStateException();
-            var args = new StateEventArgs<T>(new Transition<T>(token.Value, DefaultState!));
-
-            // Leaves the current state then performs the transition action
-            OnLeft(args);
-            DefaulAction?.Perform(token);
-
-            // Enters the default state and performs its action
-            DefaultState!.OnReached(args);
-            DefaultState?.Action?.Perform();
-
-            return DefaultState!;
+            Activated?.Invoke(this, new EventArgs());
+        }
+        public void Deactivate() 
+        {
+            Deactivated?.Invoke(this, new EventArgs());
+        }
+        public void OnReach(TransitionEventArgs<T> args)
+        {
+            Reach?.Invoke(this, args);
+            Activate();
+        }
+        public void OnLeave(TransitionEventArgs<T> args)
+        {
+            Deactivate();
+            Leave?.Invoke(this, args);
         }
 
-        public void OnReached(StateEventArgs<T> args)
-        {
-            StateReached?.Invoke(this, args);
-        }
-
-        public void OnLeft(StateEventArgs<T> args)
-        {
-            StateLeft?.Invoke(this, args);
-        }
-
-        /// <summary>
-        /// Event triggered after a transition that targets this state is taken.
-        /// </summary>
-        public event EventHandler<StateEventArgs<T>>? StateReached;
-
-        /// <summary>
-        /// Event triggered before a transition that departs from this state is taken.
-        /// </summary>
-        public event EventHandler<StateEventArgs<T>>? StateLeft;
+        public event EventHandler? Activated;
+        public event EventHandler? Deactivated;
+        public event EventHandler<TransitionEventArgs<T>>? Reach;
+        public event EventHandler<TransitionEventArgs<T>>? Leave;
     }
 
 }

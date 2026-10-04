@@ -33,8 +33,6 @@ This project can widely be used for parsing any kind of tokens sequence, includi
 ### Components used
 
 - **Automaton**: `Nt.Automaton.Automatons.StateAutomaton`
-- **State**: `Nt.Automaton.States.StillState`
-- **Transition**: `Nt.Automaton.Transitions.Transition`
 
 ### Example
 
@@ -97,28 +95,28 @@ class Grid()
 using ITokenAction = Nt.Automatons.Actions.ITokenAction<string>;
 
 class SetLinesAction(Grid grid) : ITokenAction {
-    void Perform(IAutomatonToken token) {
+    public void Perform(IAutomatonToken token) {
         var lines = (int)token.Value;
         grid.SetLines(lines);
     }
 }
 
 class SetColumnsAction(Grid grid) : ITokenAction {
-    void Perform(IAutomatonToken token) {
+    public void Perform(IAutomatonToken token) {
         var columns = (int)token.Value;
         grid.SetColumns(columns);
-        grid.Init();
+        grid.InitContent();
     }
 }
 
 class AddOAction(Grid grid) : ITokenAction {
-    void Perform(IAutomatonToken token) {
+    public void Perform(IAutomatonToken token) {
         grid.Add(0)
     }
 }
 
 class AddXAction(Grid grid): ITokenAction {
-    void Perform(IAutomatonToken token) {
+    public void Perform(IAutomatonToken token) {
         grid.Add(1)
     }
 }
@@ -141,15 +139,15 @@ class GridService(Grid grid) {
         }
     }
 
-    void SetAutomaton() {
+    private void SetAutomaton() {
         var readLineState = Automaton.CurrentState;
         var readColumnState = new State();
         var fillGridState = new State();
 
-        readLineState.AddDefault(readColumnState, new SetLinesAction(grid));
-        readColumnState.AddDefault(fillGridState, new SetColumnsAction(grid));
-        fillGridState.AddTransition(new Transition("X", fillGridState, new AddXAction(grid);))
-        fillGridState.AddTransition(new Transition("O", fillGridState, new AddOAction(grid);))
+        readLineState.SetDefault(new Transition(readColumnState).SetAction(new SetLinesAction(grid)));
+        readColumnState.SetDefault(new Transition(fillGridState).SetAction(new SetColumnsAction(grid)));
+        fillGridState.AddTransition(new Transition("X", fillGridState).SetAction(new AddXAction(grid)));
+        fillGridState.AddTransition(new Transition("O", fillGridState).SetAction(new AddOAction(grid)));
     }
 }
 ```
@@ -163,13 +161,14 @@ class GridService(Grid grid) {
 You have a structure that is a global configuration for other components.
 
 ### Problem
-You would like the client to edit the configuration at runtime, so you can't generate the configuration from a file and parse it (like the example before). A solution is to add a user interface that allows the client to view and edit different parts of the configuration dynamically. The structure of `StackAutomaton` is made for that scenario. You focus on the code for each part of the configuration, and the automaton handles the orchestration of these different steps for you.
+You would like the client to edit the configuration at runtime, so you can't generate the configuration from a file and parse it (like the example before). 
+
+### Solution
+A solution is to add a user interface that allows the client to view and edit different parts of the configuration dynamically. The structure of `StackAutomaton` is made for that scenario. You focus on the code for each part of the configuration, and the automaton handles the orchestration of these different steps for you.
 
 ### Components used
 
 - **Automaton** : `Nt.Automaton.Automatons.StackAutomaton`
-- **State** : `Nt.Automaton.States.State`
-- **Transition** : `Nt.Automaton.Transitions.Transition`
 
 ### Example
 You have a configuration with many parameters:
@@ -210,8 +209,8 @@ using StackAutomaton = Nt.Automaton.Automatons.StackAutomaton<int>;
 // This is the first action triggered when the client opens the configuration edition service
 class BaseAction(StackAutomaton automaton): IAction {
     static void SetAutomaton(State parent, Automaton automaton, Config config) {
-        var enableState = new State(new EnableAction(automaton, config));
-        var researchState = new State(new ResearchState(automaton));
+        var enableState = new State().SetAction(new EnableAction(automaton, config)).SetFinal();
+        var researchState = new State().SetAction(new ResearchAction(automaton));
 
         parent.AddTransition(new Transition(1, enableState));
         parent.AddTransition(new Transition(2, researchState));
@@ -219,7 +218,7 @@ class BaseAction(StackAutomaton automaton): IAction {
         ResearchAction.SetAutomaton(researchState, automaton, config);
     }
 
-    void Perform() {
+    public void Perform() {
         Console.Writeline("Select a field to edit:");
         Console.Writeline("1. ENABLE");
         Console.Writeline("2. Configure research");
@@ -230,14 +229,14 @@ class BaseAction(StackAutomaton automaton): IAction {
 // Once the client enters the "Configure reserach" from the previous action, this action is triggered
 class ResearchAction(StackAutomaton automaton): IAction {
     static void SetAutomaton(State parent, Automaton automaton, Config config) {
-        var iterationsState = new State(new EnableAction(automaton, config));
-        var modeState = new State(new EnableAction(automaton, config)); 
+        var iterationsState = new State().SetAction(new IterationsAction(automaton, config)).SetFinal();
+        var modeState = new State().SetAction(new ModeAction(automaton, config)).SetFinal();
 
         parent.AddTransition(new Transition(1, iterationState));
         parent.AddTransition(new Transition(2, modeState));
     }
 
-    void Perform() {
+    public void Perform() {
         Console.Writeline("Select a field to edit research:");
         Console.Writeline("1. ITERATIONS");
         Console.Writeline("2. MODE");
@@ -247,7 +246,7 @@ class ResearchAction(StackAutomaton automaton): IAction {
 
 // The following actions are linked to the final nodes
 class EnableAction(StackAutomaton automaton, Configuration config): IAction {
-    void Perform() {
+    public void Perform() {
         Console.Writeline("Select a value:");
         Console.Writeline("1. On");
         Console.Writeline("2. Off");
@@ -256,24 +255,20 @@ class EnableAction(StackAutomaton automaton, Configuration config): IAction {
         var answer = Console.Readline;
         if (config == "1") config.Enabled = true;
         if (config == "2") config.Enabled = false;
-
-        automaton.Pop(true);
     }
 }
 
 class IterationsAction(StackAutomaton automaton, Configuration config): IAction {
-    void Perform() {
+    public void Perform() {
         Console.Writeline("Enter the number of iterations (default is 10):");
 
         var answer = Console.Readline();
         config.Iterations = (int)answer;
-
-        automaton.Pop(true);
     }
 }
 
 class ModeAction(StackAutomaton automaton, Configuration config): IAction {
-    void Perform() {
+    public void Perform() {
         Console.Writeline("Select the mode to set:")
         Console.Writeline("1. Standard");
         Console.Writeline("2. Low");
@@ -287,8 +282,6 @@ class ModeAction(StackAutomaton automaton, Configuration config): IAction {
             "3" => Modes.HIGH,
             _ => config.Mode
         };
-
-        automaton.Pop(true);
     }
 }
 ```
@@ -300,14 +293,15 @@ using Automaton = Nt.Automaton.Automatons.StackAutomaton<int>;
 class ConfigurationService(Configuration config) {
     Automaton Automaton { get; } = new Automaton().SetAutoPerformAction();
 
-    void StartUI() {
+    public void StartUI() {
         // Construct the automaton structure
-        var initialState = new State(new BaseAction(Automaton, config));
+        var initialState = new State().SetAction(new BaseAction(Automaton, config), true);
         BaseAction.SetAutomaton(initialState);
 
         // Iterate until the user escapes from the initial state
-        Automaton.Push(initialState, true);
-        while (!Automaton.IsEmpty()) {
+        Automaton.Push(initialState);
+        initialState.Activate()
+        while (!Automaton.IsEmpty) {
             var answer = (int)Console.Readline();
             Automaton.Read(new AutomatonToken(answer));
         }

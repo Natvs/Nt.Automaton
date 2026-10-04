@@ -1,5 +1,7 @@
 ﻿using Nt.Automaton.Automatons;
 using Nt.Automaton.States;
+using Nt.Automaton.Tokens;
+using Nt.Automaton.Transitions;
 using Nt.Tests.Automaton.Automatons.Instances;
 
 using static Nt.Tests.Automaton.Automatons.AutomatonUtils;
@@ -9,6 +11,8 @@ namespace Nt.Tests.Automaton.Automatons
 
     public class StateAutomatonTest
     {
+
+        // Target States
 
         [Fact]
         public void StateAutomaton_SingleTransition_ValidState()
@@ -34,11 +38,14 @@ namespace Nt.Tests.Automaton.Automatons
             Assert.Equal(state4, automaton.CurrentState);
         }
 
+        // State Actions
+
         [Fact]
         public void StateAutomaton_SingleTransition_ValidStateAction()
         {
             var action = new IncrementAction();
-            State<string> initial = new(), state1 = new(action);
+            IState<string> initial = new State<string>();
+            IState<string> state1 = new State<string>().SetAction(action);
             StateSequence(initial, [(state1, "a")]);
 
             var automaton = new StateAutomaton<string>(initial);
@@ -51,7 +58,11 @@ namespace Nt.Tests.Automaton.Automatons
         public void StateAutomaton_MultipleTransitions_ValidStateAction()
         {
             var action = new IncrementAction();
-            State<string> initial = new(), state1 = new(action), state2 = new(action), state3 = new(action), state4 = new(action);
+            IState<string> initial = new State<string>();
+            IState<string> state1 = new State<string>().SetAction(action);
+            IState<string> state2 = new State<string>().SetAction(action);
+            IState<string> state3 = new State<string>().SetAction(action);
+            IState<string> state4 = new State<string>().SetAction(action);
             StateSequence(initial, [(state1, "a"), (state2, "b"), (state3, "c"), (state4, "d")]);
 
             var automaton = new StateAutomaton<string>(initial);
@@ -73,6 +84,8 @@ namespace Nt.Tests.Automaton.Automatons
             Assert.Equal(1, action.Count);
         }
 
+        // Transition Actions
+
         [Fact]
         public void StateAutomaton_MultipleTransitions_ValidTransitionAction()
         {
@@ -90,7 +103,7 @@ namespace Nt.Tests.Automaton.Automatons
         public void StateAutomaton_DefaultTransition_ValidState()
         {
             State<string> initial = new(), state1 = new();
-            initial.SetDefault(state1);
+            initial.SetDefault(new Transition<string>(state1));
 
             var automaton = new StateAutomaton<string>(initial);
             Read(automaton, ["a"]);
@@ -102,8 +115,9 @@ namespace Nt.Tests.Automaton.Automatons
         public void StateAutomaton_DefaultTransition_ValidStateAction()
         {
             var action = new IncrementAction();
-            State<string> initial = new(), state1 = new(action);
-            initial.SetDefault(state1);
+            IState<string> initial = new State<string>();
+            IState<string> state1 = new State<string>().SetAction(action);
+            initial.SetDefault(new Transition<string>(state1));
 
             var automaton = new StateAutomaton<string>(initial);
             Read(automaton, ["a"]);
@@ -116,12 +130,56 @@ namespace Nt.Tests.Automaton.Automatons
         {
             var action = new IncrementAction();
             State<string> initial = new(), state1 = new();
-            initial.SetDefault(state1, action);
+            initial.SetDefault(new Transition<string>(state1).SetAction(action));
 
             var automaton = new StateAutomaton<string>(initial);
             Read(automaton, ["a"]);
 
             Assert.Equal(1, action.Count);
+
+        }
+
+        // Final State
+
+        [Fact]
+        public void StateAutomaton_FinalState_InvalidAutomaton()
+        {
+            var initial = new State<string>();
+            var final = new State<string>();
+            initial.AddTransition(new Transition<string>(new AutomatonToken<string>("a"), final));
+
+            var automaton = new StateAutomaton<string>(initial);
+            Read(automaton, ["a"]);
+
+            Assert.False(automaton.IsValid);
+        }
+
+        [Fact]
+        public void StateAutomaton_FinalState_ValidAutomaton()
+        {
+            var initial = new State<string>();
+            var final = new State<string>().SetFinal();
+            initial.AddTransition(new Transition<string>(new AutomatonToken<string>("a"), final));
+
+            var automaton = new StateAutomaton<string>(initial);
+            Read(automaton, ["a"]);
+
+            Assert.True(automaton.IsValid);
+        }
+
+        [Fact]
+        public void StateAutomaton_FinalState_RaiseEventWhenFinalStateReached()
+        {
+            var initial = new State<string>();
+            var final = new State<string>().SetFinal();
+            initial.AddTransition(new Transition<string>(new AutomatonToken<string>("a"), final));
+
+            var automaton = new StateAutomaton<string>(initial);
+            bool eventRaised = false;
+            automaton.FinalStateReached += (sender, e) => eventRaised = true;
+            Read(automaton, ["a"]);
+
+            Assert.True(eventRaised);
         }
     }
 }

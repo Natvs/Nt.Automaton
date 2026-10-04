@@ -45,8 +45,8 @@ sf --> [*]
 
 |Name|Type|Description|
 |----|----|-----------|
-|InitialState|IState|The initial state, set in the constructor of the automaton|
 |CurrentState|IState|The current state of the automaton|
+|IsValid|bool|Indicate whether the automaton is in a valid state (i.e., has reached a final state)|
 
 **Constructors**
 
@@ -60,10 +60,19 @@ sf --> [*]
 |----|----------|-----------|-----------|
 |Read(IAutomatonToken token)|token to read|void|Process the given token and updates the current state accordingly.|
 
+**Events**
+
+|Name|Arguments|Description|
+|----|----------|-----------|
+|FinalStateReached|the final state reached|This event is triggered when the automaton reaches a final state|
+
 ### Stack Automaton
 ---
 
-The `StackAutomaton` is an automaton combined with a stack of states. When reading a state, the new state is pushed on the stack. The particularity of such an automaton is on default state (when no transition corresponds to the token read): instead of throwing an error, it returns to the previous state in the stack. Have a look on [a use case of this automaton](UseCases.md#runtime-configuration-edition).
+The `StackAutomaton` is an automaton combined with a stack of states. 
+
+When reading a state, the new state is pushed on the stack. 
+The particularity of such an automaton is on default state (when no transition corresponds to the token read): instead of throwing an error, it returns to the previous state in the stack. Have a look on [a use case of this automaton](UseCases.md#runtime-configuration-edition).
 
 Methods like `Push` and `Pop` allow to directly add or remove to and from the stack.
 
@@ -114,27 +123,28 @@ s3 --> [*]
 |Name|Type|Description|
 |----|----|-----------|
 |CurrentState|IState|The current state of the automaton.|
+|IsEmpty|bool|Indicate whether the automaton is empty (i.e., has no state in the stack).|
+|IsValid|bool|Indicate whether the automaton is in a valid state (same as IsEmpty).|
 
 **Constructors and build methods**
 
 |Name|Parameters|Description|
 |----|----------|-----------|
 |StackAutomaton()||Default constructor of a new instance of StackAutomaton|
-|SetAutoPerformAction()||Call it once to automatically perform actions linked to states when the automatons pops one from the stack|
 
 **Methods**
 
 |Name|Parameters|Return Type|Description|
 |----|----------|-----------|-----------|
 |Read(IAutomatonToken token)|token to read|void|Process the given token, goes to the new state and push it on the stack|
-|Push(IState newState [, bool performAction])|State to push and whether or not to perform the action linked to it|void|Push a new state on the stack|
-|Pop([bool performAction])|Whether or not to perform the action linked to the state|void|Pop the last state from the stack|
-|IsEmpty()||bool|Boolean value defining if there are still states in the stack|
+|Push(IState newState)|State to push|void|Push a new state on the stack. If it is a final node, automatically pops it after pushing it.|
+|Pop()||void|Pop the last state from the stack|
 
 **Events**
 
-|Name|Parameters|Description|
+|Name|Arguments|Description|
 |----|----------|-----------|
+|FinalStateReached|the final state reached|This event is triggered when the automaton reaches a final state|
 |StatePushed||This event is triggered after a state is pushed onto the stack|
 |StatePopped||This event is triggered after a state is popped from the stack|
 
