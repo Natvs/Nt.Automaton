@@ -11,7 +11,7 @@ on:
 env:
   PROJECT_PATH: Nt.Automaton.Domain
   PROJECT_FILE: Nt.Automaton.Domain.csproj
-  SBOM_DIR: Nt.Automaton.Domain/tmp
+  SBOM_DIR: Nt.Automaton.Domain/tmp                   
   SBOM_ARTIFACT: sbom.json
   GH_TOKEN: ${{github.token}}
 

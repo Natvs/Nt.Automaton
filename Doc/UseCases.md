@@ -95,28 +95,28 @@ class Grid()
 using ITokenAction = Nt.Automatons.Actions.ITokenAction<string>;
 
 class SetLinesAction(Grid grid) : ITokenAction {
-    void Perform(IAutomatonToken token) {
+    public void Perform(IAutomatonToken token) {
         var lines = (int)token.Value;
         grid.SetLines(lines);
     }
 }
 
 class SetColumnsAction(Grid grid) : ITokenAction {
-    void Perform(IAutomatonToken token) {
+    public void Perform(IAutomatonToken token) {
         var columns = (int)token.Value;
         grid.SetColumns(columns);
-        grid.Init();
+        grid.InitContent();
     }
 }
 
 class AddOAction(Grid grid) : ITokenAction {
-    void Perform(IAutomatonToken token) {
+    public void Perform(IAutomatonToken token) {
         grid.Add(0)
     }
 }
 
 class AddXAction(Grid grid): ITokenAction {
-    void Perform(IAutomatonToken token) {
+    public void Perform(IAutomatonToken token) {
         grid.Add(1)
     }
 }
@@ -139,7 +139,7 @@ class GridService(Grid grid) {
         }
     }
 
-    void SetAutomaton() {
+    private void SetAutomaton() {
         var readLineState = Automaton.CurrentState;
         var readColumnState = new State();
         var fillGridState = new State();
@@ -218,7 +218,7 @@ class BaseAction(StackAutomaton automaton): IAction {
         ResearchAction.SetAutomaton(researchState, automaton, config);
     }
 
-    void Perform() {
+    public void Perform() {
         Console.Writeline("Select a field to edit:");
         Console.Writeline("1. ENABLE");
         Console.Writeline("2. Configure research");
@@ -236,7 +236,7 @@ class ResearchAction(StackAutomaton automaton): IAction {
         parent.AddTransition(new Transition(2, modeState));
     }
 
-    void Perform() {
+    public void Perform() {
         Console.Writeline("Select a field to edit research:");
         Console.Writeline("1. ITERATIONS");
         Console.Writeline("2. MODE");
@@ -246,7 +246,7 @@ class ResearchAction(StackAutomaton automaton): IAction {
 
 // The following actions are linked to the final nodes
 class EnableAction(StackAutomaton automaton, Configuration config): IAction {
-    void Perform() {
+    public void Perform() {
         Console.Writeline("Select a value:");
         Console.Writeline("1. On");
         Console.Writeline("2. Off");
@@ -259,7 +259,7 @@ class EnableAction(StackAutomaton automaton, Configuration config): IAction {
 }
 
 class IterationsAction(StackAutomaton automaton, Configuration config): IAction {
-    void Perform() {
+    public void Perform() {
         Console.Writeline("Enter the number of iterations (default is 10):");
 
         var answer = Console.Readline();
@@ -268,7 +268,7 @@ class IterationsAction(StackAutomaton automaton, Configuration config): IAction 
 }
 
 class ModeAction(StackAutomaton automaton, Configuration config): IAction {
-    void Perform() {
+    public void Perform() {
         Console.Writeline("Select the mode to set:")
         Console.Writeline("1. Standard");
         Console.Writeline("2. Low");
@@ -293,7 +293,7 @@ using Automaton = Nt.Automaton.Automatons.StackAutomaton<int>;
 class ConfigurationService(Configuration config) {
     Automaton Automaton { get; } = new Automaton().SetAutoPerformAction();
 
-    void StartUI() {
+    public void StartUI() {
         // Construct the automaton structure
         var initialState = new State().SetAction(new BaseAction(Automaton, config), true);
         BaseAction.SetAutomaton(initialState);
