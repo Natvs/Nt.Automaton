@@ -46,6 +46,43 @@ jobs:
           name: ${{env.SBOM_ARTIFACT}}
           path: ${{env.SBOM_DIR}}
 
+  check-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout solution
+        uses: actions/checkout@v7 
+      - name: Retrieve version
+        id: version
+        run: |
+          cd ${{env.PROJECT_PATH}}  
+          VERSION=$(dotnet msbuild ${{env.PROJECT_FILE}} -getProperty:Version)
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Project version: $VERSION"
+      - name: Create tag
+        id: tag
+        shell: pwsh
+        run: |
+          $TAG = "v${{steps.version.outputs.version}}"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          if (gh release view "$TAG") {     
+            echo "create=false" >> "$GITHUB_OUTPUT"
+            echo "Release $TAG already exists. No release will be created."
+          } else {     
+            echo "create=true" >> "$GITHUB_OUTPUT"
+            echo "Release $TAG does not exist. A new release will be created."
+          }
+      - name: Retrieve release note
+        id: release-note  
+        run: |
+          cd ${{env.PROJECT_PATH}}
+          NOTES=$(dotnet msbuild ${{env.PROJECT_FILE}} -getProperty:ReleasesNotes)
+          echo "notes=$NOTES" >> "$GITHUB_OUTPUT"
+    outputs:
+      tag: ${{steps.tag.outputs.tag}}
+      create-release: ${{steps.tag.outputs.create}}
+      notes: ${{steps.release-note.outputs.notes}}
+
   check-nuget:
     runs-on: ubuntu-latest
 
@@ -74,43 +111,6 @@ jobs:
     outputs:
       create-package: ${{steps.check.outputs.create}}
 
-  check-release:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout solution
-        uses: actions/checkout@v7 
-      - name: Retrieve version
-        id: version
-        run: |
-          cd ${{env.PROJECT_PATH}}  
-          VERSION=$(dotnet msbuild ${{env.PROJECT_FILE}} -getProperty:Version)
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "Projet version: $VERSION"
-      - name: Create tag
-        id: tag
-        shell: pwsh
-        run: |
-          $TAG = "v${{steps.version.outputs.version}}"
-          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-          if (gh release view "$TAG") {     
-            echo "create=false" >> "$GITHUB_OUTPUT"
-            echo "Release $TAG already exists. No release will be created."
-          } else {     
-            echo "create=true" >> "$GITHUB_OUTPUT"
-            echo "Release $TAG does not exist. A new release will be created."
-          }
-      - name: Retrieve release note
-        id: release-note  
-        run: |
-          cd ${{env.PROJECT_PATH}}
-          NOTES=$(dotnet msbuild ${{env.PROJECT_FILE}} -getProperty:ReleasesNotes)
-          echo "notes=$NOTES" >> "$GITHUB_OUTPUT"
-    outputs:
-      tag: ${{steps.tag.outputs.tag}}
-      create-release: ${{steps.tag.outputs.create}}
-      notes: ${{steps.release-note.outputs.notes}}
-
   create-release:
     needs:
       - build
@@ -127,7 +127,7 @@ jobs:
         with:
           name: ${{env.SBOM_ARTIFACT}}
           path: ${{env.SBOM_DIR}}
-      - name: Publish release
+      - name: Create release
         run: |
           TAG=${{needs.check-release.outputs.tag}}
           NOTES=${{needs.check-release.outputs.notes}}
