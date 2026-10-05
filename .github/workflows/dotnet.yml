@@ -164,7 +164,7 @@ jobs:
             --password ${{ secrets.PACKAGE_REPO_TOKEN }} \
             --store-password-in-clear-text
       - name: Pack
-        run: dotnet pack ${{ env.PROJECT_PATH }} --configuration Release --output ${{ env.NUGET_PATH }}
+        run: dotnet pack ${{ env.PROJECT_PATH }} --configuration Release --output ${{ env.NUGET_PATH }} --verbosity quiet
       - name: Publish
         shell: pwsh
         run: |
