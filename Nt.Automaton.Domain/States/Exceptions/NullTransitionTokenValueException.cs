@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Nt.Automaton.States.Exceptions
 {
-    public class NullTransitionTokenValue() : Exception("Transition token value cannot be null.")
+    public class NullTransitionTokenValueException() : Exception("Transition token value cannot be null.")
     {
     }
 }

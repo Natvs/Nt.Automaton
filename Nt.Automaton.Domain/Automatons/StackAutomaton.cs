@@ -38,10 +38,10 @@ namespace Nt.Automaton.Automatons
             }
         }
 
-        public void Push(IState<T> new_state)
+        public void Push(IState<T> target)
         {
             if (CurrentState != null) Stack.Push(CurrentState);
-            CurrentState = new_state;
+            CurrentState = target;
             StatePushed?.Invoke(this, EventArgs.Empty);
 
             if (CurrentState.IsFinal)
