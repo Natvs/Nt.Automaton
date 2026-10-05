@@ -8,17 +8,21 @@
 		<Title>Nt.Automaton</Title>
 		<RootNamespace>Nt.Automaton</RootNamespace>
 		<Description>Automaton with states that can trigger actions</Description>
-		<Version>1.1.2</Version>
-		<ReleasesNotes>Automatically publishes SBOM for associated nuget packages with new releases</ReleasesNotes>
+		<Version>1.2.0</Version>
+		<ReleasesNotes>Added final states</ReleasesNotes>
 	  
 		<RepositoryUrl>https://github.com/Natvs/Nt.Automaton</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 
 		<PackageId>Nt.Automaton</PackageId>
-		<PackageVersion>1.1.2</PackageVersion>
+		<PackageVersion>1.2.0</PackageVersion>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageTags>automate ; automaton ; states</PackageTags>
-		<PackageReleaseNotes>Automatically publishes SBOM for associated nuget packages with new releases</PackageReleaseNotes>
+		<PackageReleaseNotes>Added final states</PackageReleaseNotes>
+
+		<AnalysisLevel>latest</AnalysisLevel>
+		<AnalysisMode>Recommended</AnalysisMode>
+		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
 	</PropertyGroup>
 
   <ItemGroup>
