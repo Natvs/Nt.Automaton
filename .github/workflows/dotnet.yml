@@ -72,6 +72,7 @@ jobs:
             echo "create=true" >> "$GITHUB_OUTPUT"
             echo "Release $TAG does not exist. A new release will be created."
           }
+        continue-on-error: true
       - name: Retrieve release note
         id: release-note  
         run: |
