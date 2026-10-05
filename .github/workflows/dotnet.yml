@@ -136,7 +136,7 @@ jobs:
           NOTES="${{needs.check-release.outputs.notes}}"
           gh release create \
             $TAG \
-            "${{env.SBOM_DIR}}/*#${{env.SBOM_ARTIFACT}}" \
+            "${{env.SBOM_DIR}}/${{env.SBOM_ARTIFACT}}" \
             --notes "$NOTES"
 
   # This job requires a secret token PACKAGE_REPO_TOKEN with write access to the local package repository
