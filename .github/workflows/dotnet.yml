@@ -130,12 +130,12 @@ jobs:
           path: ${{env.SBOM_DIR}}
       - name: Create release
         run: |
-          TAG=${{needs.check-release.outputs.tag}}
-          NOTES=${{needs.check-release.outputs.notes}}
+          TAG="${{needs.check-release.outputs.tag}}"
+          NOTES="${{needs.check-release.outputs.notes}}"
           gh release create \
             $TAG \
             "${{env.SBOM_DIR}}/*#${{env.SBOM_ARTIFACT}}" \
-            --notes $NOTES
+            --notes "$NOTES"
 
   # This job requires a secret token PACKAGE_REPO_TOKEN with write access to the local package repository
   publish-nuget:
