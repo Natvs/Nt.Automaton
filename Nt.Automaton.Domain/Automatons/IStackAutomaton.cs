@@ -28,7 +28,7 @@ namespace Nt.Automaton.Automatons
         /// <summary>
         /// Push the current state onto the stack.
         /// </summary>
-        /// <param name="new_state">The state to transition to.</param>
-        void Push(IState<T> new_state);
+        /// <param name="target">The state to transition to.</param>
+        void Push(IState<T> target);
     }
 }

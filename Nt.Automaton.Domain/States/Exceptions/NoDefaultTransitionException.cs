@@ -2,6 +2,5 @@
 {
     public class NoDefaultTransitionException() : Exception("Default state is not defined")
     {
-
     }
 }

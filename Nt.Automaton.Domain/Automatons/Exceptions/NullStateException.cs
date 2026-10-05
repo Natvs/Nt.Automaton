@@ -4,5 +4,5 @@ using System.Text;
 
 namespace Nt.Automaton.Automatons.Exceptions
 {
-    internal class NullStateException(string message) : Exception(message) { }
+    public class NullStateException(string message) : Exception(message) { }
 }
