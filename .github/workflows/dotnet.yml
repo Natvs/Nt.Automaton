@@ -78,7 +78,7 @@ jobs:
           exit 0
     outputs:
       tag: ${{steps.tag.outputs.tag}}
-      create-release: ${{steps.tag.outputs.create}}
+      create-release: ${{steps.check.outputs.create}}
 
   check-nuget:
     runs-on: ubuntu-latest
