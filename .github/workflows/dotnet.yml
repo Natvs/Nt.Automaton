@@ -128,6 +128,8 @@ jobs:
         with:
           name: ${{env.SBOM_ARTIFACT}}
           path: ${{env.SBOM_DIR}}
+      - name: Display structure
+        run: ls -R
       - name: Create release
         run: |
           TAG="${{needs.check-release.outputs.tag}}"
