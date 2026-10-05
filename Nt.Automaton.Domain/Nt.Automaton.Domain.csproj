@@ -7,9 +7,8 @@
 		
 		<Title>Nt.Automaton</Title>
 		<RootNamespace>Nt.Automaton</RootNamespace>
-		<Description>Automaton with states that can trigger actions</Description>
-		<Version>1.2.0</Version>
-		<ReleasesNotes>Added final states</ReleasesNotes>
+		<Description>Utility library for automaton operations</Description>
+		<Version>1.2.1</Version>
 	  
 		<RepositoryUrl>https://github.com/Natvs/Nt.Automaton</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
@@ -18,7 +17,7 @@
 		<PackageVersion>1.2.0</PackageVersion>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageTags>automate ; automaton ; states</PackageTags>
-		<PackageReleaseNotes>Added final states</PackageReleaseNotes>
+		<PackageReleaseNotes>Remove release notes from ci/cd workflow</PackageReleaseNotes>
 
 		<AnalysisLevel>latest</AnalysisLevel>
 		<AnalysisMode>Recommended</AnalysisMode>
