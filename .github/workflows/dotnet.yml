@@ -60,10 +60,14 @@ jobs:
           echo "Project version: $VERSION"
       - name: Create tag
         id: tag
+        run: |
+          TAG = "v${{steps.version.outputs.version}}"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+      - name: Check release
+        id: check
         shell: pwsh
         run: |
-          $TAG = "v${{steps.version.outputs.version}}"
-          echo "tag=$TAG" >> "$env:GITHUB_OUTPUT"
+          $TAG = "${{steps.tag.outputs.tag}}"
           if (gh release view "$TAG") {     
             echo "create=false" >> "$env:GITHUB_OUTPUT"
             echo "Release $TAG already exists. No release will be created."
@@ -72,16 +76,9 @@ jobs:
             echo "Release $TAG does not exist. A new release will be created."
           }
           exit 0
-      - name: Retrieve release note
-        id: release-note  
-        run: |
-          cd ${{env.PROJECT_PATH}}
-          NOTES=$(dotnet msbuild ${{env.PROJECT_FILE}} -getProperty:ReleasesNotes)
-          echo "notes=$NOTES" >> "$GITHUB_OUTPUT"
     outputs:
       tag: ${{steps.tag.outputs.tag}}
       create-release: ${{steps.tag.outputs.create}}
-      notes: ${{steps.release-note.outputs.notes}}
 
   check-nuget:
     runs-on: ubuntu-latest
@@ -134,8 +131,7 @@ jobs:
           gh release create \
             $TAG \
             "${{env.SBOM_DIR}}/bom.json#${{env.SBOM_ARTIFACT}}" \
-            --title $TAG \
-            --notes "$NOTES"
+            --title $TAG
 
   # This job requires a secret token PACKAGE_REPO_TOKEN with write access to the local package repository
   publish-nuget:
