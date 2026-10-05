@@ -48,7 +48,6 @@ jobs:
 
   check-release:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout solution
         uses: actions/checkout@v7 
@@ -86,7 +85,6 @@ jobs:
 
   check-nuget:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v7
       - name: Retrieve version
@@ -119,7 +117,8 @@ jobs:
       - generate-sbom
     if: github.event_name == 'push' && needs.check-release.outputs.create-release == 'true'
     runs-on: ubuntu-latest
-  
+    permissions:
+      contents: write  
     steps:
       - name: Checkout solution
         uses: actions/checkout@v7
@@ -148,7 +147,6 @@ jobs:
       NUGET_REPO: https://nuget.pkg.github.com/Natvs/index.json
       NUGET_USERNAME: Natvs
       NUGET_PATH: "${{github.workspace}}/nuget"
-    
     steps:
       - uses: actions/checkout@v4
       - name: Setup .NET
