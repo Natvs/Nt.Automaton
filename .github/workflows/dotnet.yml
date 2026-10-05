@@ -107,6 +107,7 @@ jobs:
     outputs:
       create-package: ${{steps.check.outputs.create}}
 
+  # This job requires a file release-notes.md in the root of the repository with the release notes for the new release.
   create-release:
     needs:
       - build
@@ -117,6 +118,8 @@ jobs:
     permissions:
       contents: write  
     env:
+      title: ${{needs.check-release.outputs.tag}}
+      tag: ${{needs.check-release.outputs.tag}}
       release-file: release-notes.md
     steps:
       - name: Checkout solution
@@ -128,14 +131,16 @@ jobs:
           path: ${{env.SBOM_DIR}}
       - name: Create release
         run: |
-          TAG="${{needs.check-release.outputs.tag}}"
           gh release create \
-            $TAG \
+            ${{env.tag}} \
             "${{env.SBOM_DIR}}/bom.json#${{env.SBOM_ARTIFACT}}" \
-            --title $TAG \
-            --notes-file release-notes.md
+            --title ${{env.title}}
+      - name: Upload release notes
+        shell: pwsh
+        run: |
+            Get-Content ${{env.release-file}} | gh release edit ${{env.tag}} --notes-file -
 
-  # This job requires a secret token PACKAGE_REPO_TOKEN with write access to the local package repository
+  # This job requires a secret token PACKAGE_REPO_TOKEN with write access to the local package repository.
   publish-nuget:
     needs: 
       - build
