@@ -134,7 +134,7 @@ jobs:
           gh release create \
             $TAG \
             "${{env.SBOM_DIR}}/bom.json#${{env.SBOM_ARTIFACT}}" \
-            --title $TAG
+            --title $TAG \
             --notes "$NOTES"
 
   # This job requires a secret token PACKAGE_REPO_TOKEN with write access to the local package repository
