@@ -91,7 +91,7 @@ jobs:
         id: tag
         shell: pwsh
         run: |
-          $TAG = v${{steps.version.outputs.version}}
+          $TAG = "v${{steps.version.outputs.version}}"
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           if (gh release view "$TAG") {     
             echo "create=false" >> "$GITHUB_OUTPUT"
