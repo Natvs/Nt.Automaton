@@ -8,7 +8,7 @@ on:
 env:
   PROJECT_PATH: "Nt.Automaton.Domain"
   PROJECT_FILE: "Nt.Automaton.Domain.csproj"
-  SBOM_DIR: "Nt.Automaton.Domain/tmp"                   
+  SBOM_DIR: "Nt.Automaton.Domain/bom"                   
   SBOM_ARTIFACT: sbom.json
   GH_TOKEN: ${{github.token}}
 
@@ -89,16 +89,17 @@ jobs:
           echo "Projet version: $VERSION"
       - name: Create tag
         id: tag
+        shell: pwsh
         run: |
-          TAG=v${{steps.version.outputs.version}}
+          $TAG = v${{steps.version.outputs.version}}
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-          if gh release view "$TAG";
-          then      
+          if (gh release view "$TAG") {     
             echo "create=false" >> "$GITHUB_OUTPUT"
-            echo "Release $TAG already exists. No release will be created.";     
-          else     
+            echo "Release $TAG already exists. No release will be created."
+          } else {     
             echo "create=true" >> "$GITHUB_OUTPUT"
-            echo "Release $TAG does not exist. A new release will be created.";     fi
+            echo "Release $TAG does not exist. A new release will be created."
+          }
       - name: Retrieve release note
         id: release-note  
         run: |
@@ -115,7 +116,7 @@ jobs:
       - build
       - check-release
       - generate-sbom
-    if: needs.check-release.outputs.create-release == 'true'
+    if: github.event_name == 'push' && needs.check-release.outputs.create-release == 'true'
     runs-on: ubuntu-latest
   
     steps:
@@ -126,12 +127,14 @@ jobs:
         with:
           name: ${{env.SBOM_ARTIFACT}}
           path: ${{env.SBOM_DIR}}
-      - name: Make release
-        uses: softprops/action-gh-release@v3.0.0
-        with:
-          token: ${{secrets.REPO_TOKEN}}
-          tag_name: ${{needs.check-release.outputs.tag}}
-          body: ${{needs.check-release.outputs.notes}}
+      - name: Publish release
+        run: |
+          TAG=${{needs.check-release.outputs.tag}}
+          NOTES=${{needs.check-release.outputs.notes}}
+          gh release create \
+            $TAG \
+            "${{env.SBOM_DIR}}/*#${{env.SBOM_ARTIFACT}}" \
+            --notes $NOTES
 
   # This job requires a secret token PACKAGE_REPO_TOKEN with write access to the local package repository
   publish-nuget:
@@ -154,7 +157,7 @@ jobs:
       - name: Authenticate GitHub package source
         run: |
           dotnet nuget add source \
-          ${{ env.NUGET_REPO }} \
+            ${{ env.NUGET_REPO }} \
             --name github \
             --username ${{ env.NUGET_USERNAME }} \
             --password ${{ secrets.PACKAGE_REPO_TOKEN }} \
@@ -167,7 +170,5 @@ jobs:
           Get-ChildItem -Path "${{ env.NUGET_PATH }}" -Filter "*.nupkg" | ForEach-Object {
               dotnet nuget push $_.FullName --source "github" --skip-duplicate
           }
-          files: 
-            ${{env.SBOM_DIR}}/*
 
     
