@@ -64,12 +64,12 @@ jobs:
         shell: pwsh
         run: |
           $TAG = "v${{steps.version.outputs.version}}"
-          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG" >> "$env:GITHUB_OUTPUT"
           if (gh release view "$TAG") {     
-            echo "create=false" >> "$GITHUB_OUTPUT"
+            echo "create=false" >> "$env:GITHUB_OUTPUT"
             echo "Release $TAG already exists. No release will be created."
           } else {     
-            echo "create=true" >> "$GITHUB_OUTPUT"
+            echo "create=true" >> "$env:GITHUB_OUTPUT"
             echo "Release $TAG does not exist. A new release will be created."
           }
           exit 0
@@ -103,10 +103,10 @@ jobs:
           $obj = gh api "/users/natvs/packages/nuget/Nt.Automaton/versions" | ConvertFrom-Json
           $version = "${{steps.version.outputs.version}}"
           if ($obj.name | Select-String $version) {
-            echo "create=false" >> "$GITHUB_OUTPUT"
+            echo "create=false" >> "$env:GITHUB_OUTPUT"
             echo "Package for version $version already exists. No additional to create." 
           } else {
-            echo "create=true" >> "$GITHUB_OUTPUT"
+            echo "create=true" >> "$env:GITHUB_OUTPUT"
             echo "Package for version $version inexistant. A new package will be created."
           }
     outputs:
