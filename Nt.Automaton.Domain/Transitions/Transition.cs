@@ -27,6 +27,12 @@ namespace Nt.Automaton.Transitions
             Target = newState;
         }
 
+        public Transition(T value, IState<T> newState)
+        {
+            Token = new AutomatonToken<T>(value);
+            Target = newState;
+        }
+
         public IAutomatonToken<T> Token { get; }
         public IState<T> Target { get; }
 

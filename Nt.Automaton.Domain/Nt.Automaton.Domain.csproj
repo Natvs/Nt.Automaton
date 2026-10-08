@@ -8,16 +8,16 @@
 		<Title>Nt.Automaton</Title>
 		<RootNamespace>Nt.Automaton</RootNamespace>
 		<Description>Utility library for automaton operations</Description>
-		<Version>1.2.1</Version>
+		<Version>1.2.2</Version>
 	  
 		<RepositoryUrl>https://github.com/Natvs/Nt.Automaton</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 
 		<PackageId>Nt.Automaton</PackageId>
-		<PackageVersion>1.2.0</PackageVersion>
+		<PackageVersion>1.2.2</PackageVersion>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageTags>automate ; automaton ; states</PackageTags>
-		<PackageReleaseNotes>Remove release notes from ci/cd workflow</PackageReleaseNotes>
+		<PackageReleaseNotes>Syntax correction for declaration of transitions</PackageReleaseNotes>
 
 		<AnalysisLevel>latest</AnalysisLevel>
 		<AnalysisMode>Recommended</AnalysisMode>
