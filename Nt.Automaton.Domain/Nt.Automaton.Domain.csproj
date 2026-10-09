@@ -8,16 +8,16 @@
 		<Title>Nt.Automaton</Title>
 		<RootNamespace>Nt.Automaton</RootNamespace>
 		<Description>Utility library for automaton operations</Description>
-		<Version>1.2.2</Version>
+		<Version>1.2.3</Version>
 	  
 		<RepositoryUrl>https://github.com/Natvs/Nt.Automaton</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 
 		<PackageId>Nt.Automaton</PackageId>
-		<PackageVersion>1.2.2</PackageVersion>
+		<PackageVersion>1.2.3</PackageVersion>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageTags>automate ; automaton ; states</PackageTags>
-		<PackageReleaseNotes>Syntax correction for declaration of transitions</PackageReleaseNotes>
+		<PackageReleaseNotes>Review order of execution for actions in the StackAutomaton</PackageReleaseNotes>
 
 		<AnalysisLevel>latest</AnalysisLevel>
 		<AnalysisMode>Recommended</AnalysisMode>
@@ -26,9 +26,16 @@
 
   <ItemGroup>
     <None Include="..\README.md">
+	  <Visible>false</Visible>
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+	<None Include="..\Doc\**">
+	  <Visible>false</Visible>
+	  <Link>Doc\%(RecursiveDir)%(Filename)%(Extension)</Link>
+	  <Pack>True</Pack>
+	  <PackagePath>\Doc\</PackagePath>
+	</None>
   </ItemGroup>
 
 </Project>

@@ -248,5 +248,21 @@ namespace Nt.Tests.Automaton.Automatons
             Assert.Equal(1, action.Count);
         }
 
+        [Fact]
+        public void StackAutomaton_FinalTransition_ActivateActionsInOrder()
+        {
+            var action1 = new IncrementAction();
+            var action2 = new IncrementAction().SetCondition(() => action1.Count == 1);
+            var initial = new State<string>().SetAction(action2);
+            var final = new State<string>().SetAction(action1).SetFinal();
+            StateSequence(initial, [(final, "a")]);
+
+            var automaton = new StackAutomaton<string>();
+            automaton.Push(initial);
+            Read(automaton, ["a"]);
+
+            Assert.Equal(1, action1.Count);
+            Assert.Equal(1, action2.Count);
+        }
     }
 }

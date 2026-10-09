@@ -28,12 +28,11 @@ namespace Nt.Automaton.Automatons
 
             try
             {
-                CurrentState.Leave += Push;
-                CurrentState.Read(token);
+                var newstate = CurrentState.Read(token);
+                Push(newstate);
             }
             catch (NoDefaultTransitionException)
             {
-                CurrentState.Leave -= Push;
                 Pop();
             }
         }
@@ -51,16 +50,6 @@ namespace Nt.Automaton.Automatons
                 CurrentState.Activate();
                 FinalStateReached?.Invoke(this, new StateEventArgs<T>(CurrentState));
             }
-        }
-        private void Push(object? sender, TransitionEventArgs<T> e)
-        {
-            var state = (IState<T>)sender!;
-
-            if (state is null) throw new NullStateException("Can't push a null state");
-            state.Leave -= Push;
-
-            if (e.Transition == null) return;
-            Push(e.Transition.Target);
         }
         public void Pop()
         {
