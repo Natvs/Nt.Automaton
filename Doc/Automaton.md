@@ -136,9 +136,9 @@ s3 --> [*]
 
 |Name|Parameters|Return Type|Description|
 |----|----------|-----------|-----------|
-|Read(IAutomatonToken token)|token to read|void|Process the given token, goes to the new state and push it on the stack|
+|Read(IAutomatonToken token)|token to read|void|Process the given token, activates new state and push it on the stack. If no transition is found, it pops the stack and activates the previous state.|
 |Push(IState newState)|State to push|void|Push a new state on the stack. If it is a final node, automatically pops it after pushing it.|
-|Pop()||void|Pop the last state from the stack|
+|Pop()||void|Pop the last state from the stack.|
 
 **Events**
 
@@ -148,3 +148,30 @@ s3 --> [*]
 |StatePushed||This event is triggered after a state is pushed onto the stack|
 |StatePopped||This event is triggered after a state is popped from the stack|
 
+**Pushing and popping states**
+
+Although the method `Read` automatically handles the stack, you may still want in some scenarios to manually push or pop states from the stack. 
+The `Push` and `Pop` methods allow you to do this. However, these two methods don't activate or deactivate states, so there is a pattern to follow.
+
+If you want to push a state on the stack while triggering its action, you should do so:
+```csharp
+Automaton.CurrentState.Deactivate();
+Automaton.Push(newState);
+Automaton.CurrentState.Activate();
+```
+
+However, if you just wish to store this state on the stack without triggering its action, you can just use the `Push` method.
+This can be useful when you want to store intermediate states on the stach without triggering their actions, and then return to them later by popping them.
+
+The same applies for popping a state from the stack. If you want to pop a state and trigger the action, you should do so:
+```csharp
+Automaton.CurrentState.Deactivate();
+Automaton.Pop();
+Automaton.CurrentState.Activate();
+```
+
+But if you just want to pop a state from the stack without triggering its action, you can just use the `Pop` method. 
+This is particularely useful when you want to return several states back in the stack without triggering the intermediate state actions.
+
+> Note that the `Read` method does that automatically and you don't have to worry about it in the majority of scenarios. 
+> The only time you should worry about it is when you are manually pushing or popping states from the stack for more specific use cases.

@@ -36,7 +36,7 @@ namespace Nt.Automaton.Automatons
             {
                 CurrentState.Deactivate();
                 Pop();
-                CurrentState.Activate();
+                CurrentState?.Activate();
                 HandleFinalState();
             }
         }

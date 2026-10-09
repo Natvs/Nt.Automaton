@@ -65,6 +65,18 @@ namespace Nt.Tests.Automaton.Automatons
             Assert.Equal(initial, automaton.CurrentState);
         }
 
+        [Fact]
+        public void StackAutomaton_BackwardTransition_OnInitialState()
+        {
+            var initial = new State<string>();
+
+            var automaton = new StackAutomaton<string>();
+            automaton.Push(initial);
+            Read(automaton, ["a"]);
+
+            Assert.True(automaton.IsEmpty);
+        }
+
         // State Actions
 
         [Fact]
