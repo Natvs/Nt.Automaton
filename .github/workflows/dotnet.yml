@@ -6,9 +6,9 @@ on:
     branches: [ "master" ]
 
 env:
-  PROJECT_PATH: "Nt.Automaton.Domain"
-  PROJECT_FILE: "Nt.Automaton.Domain.csproj"
-  SBOM_DIR: "Nt.Automaton.Domain/bom"                   
+  PROJECT_PATH: "Domain"
+  PROJECT_FILE: "Domain.csproj"
+  SBOM_DIR: "bom"                   
   SBOM_ARTIFACT: sbom.json
   GH_TOKEN: ${{github.token}}
 
