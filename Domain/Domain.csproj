@@ -17,7 +17,7 @@
 		<PackageVersion>1.2.3</PackageVersion>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageTags>automate ; automaton ; states</PackageTags>
-		<PackageReleaseNotes>Review order of execution for actions in the StackAutomaton</PackageReleaseNotes>
+		<PackageReleaseNotes>Fix bugs in StackAutomaton</PackageReleaseNotes>
 
 		<AnalysisLevel>latest</AnalysisLevel>
 		<AnalysisMode>Recommended</AnalysisMode>

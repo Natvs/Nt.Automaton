@@ -86,15 +86,16 @@ namespace Nt.Tests.Automaton.Automatons
         public void StackAutomaton_SingleBackwardTransition_ValidStateAction()
         {
             var action = new IncrementAction();
-            var initial = new State<string>();
-            var state1 = new State<string>().SetAction(action);
+            var initial = new State<string>().SetAction(action);
+            var state1 = new State<string>();
             StateSequence(initial, [(state1, "a")]);
 
             var automaton = new StackAutomaton<string>();
             automaton.Push(initial);
+            initial.Activate();
             Read(automaton, ["a", "b"]);
 
-            Assert.Equal(1, action.Count);
+            Assert.Equal(2, action.Count);
         }
 
         [Fact]
@@ -118,16 +119,16 @@ namespace Nt.Tests.Automaton.Automatons
         public void StackAutomaton_MultipleBackwardTransitions_ValidStateAction()
         {
             var action = new IncrementAction();
-            var initial = new State<string>();
+            var initial = new State<string>().SetAction(action);
             var state1 = new State<string>().SetAction(action);
             var state2 = new State<string>().SetAction(action);
             var state3 = new State<string>().SetAction(action);
-            var state4 = new State<string>().SetAction(action);
-            state4.SetDefault(new Transition<string>(state4));
+            var state4 = new State<string>();
             StateSequence(initial, [(state1, "a"), (state2, "b"), (state3, "c"), (state4, "d")]);
 
             var automaton = new StackAutomaton<string>();
             automaton.Push(initial);
+            initial.Activate();
             Read(automaton, ["a", "b", "c", "d", "e", "e", "e", "e"]);
 
             Assert.Equal(8, action.Count);

@@ -30,10 +30,26 @@ namespace Nt.Automaton.Automatons
             {
                 var newstate = CurrentState.Read(token);
                 Push(newstate);
+                HandleFinalState();
             }
             catch (NoDefaultTransitionException)
             {
+                CurrentState.Deactivate();
                 Pop();
+                CurrentState.Activate();
+                HandleFinalState();
+            }
+        }
+
+        private void HandleFinalState()
+        {
+            if (CurrentState == null) return;
+            if (CurrentState.IsFinal)
+            {
+                CurrentState.Deactivate();
+                Pop();
+                CurrentState.Activate();
+                FinalStateReached?.Invoke(this, new StateEventArgs<T>(CurrentState));
             }
         }
 
@@ -42,14 +58,6 @@ namespace Nt.Automaton.Automatons
             if (CurrentState != null) Stack.Push(CurrentState);
             CurrentState = target;
             StatePushed?.Invoke(this, EventArgs.Empty);
-
-            if (CurrentState.IsFinal)
-            {
-                CurrentState.Deactivate();
-                Pop();
-                CurrentState.Activate();
-                FinalStateReached?.Invoke(this, new StateEventArgs<T>(CurrentState));
-            }
         }
         public void Pop()
         {
