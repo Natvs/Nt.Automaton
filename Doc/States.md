@@ -4,7 +4,9 @@
 - [Methods](#methods)
 - [Events](#events)
 - [Workflow](#workflow)
-- [Customisable states](#customisable-states)
+- [Advanced features](#advanced-features)
+	- [Evolutive states](#evolutive-states)
+	- [Customisable states](#customisable-states)
 
 ## Structure
 
@@ -27,6 +29,22 @@ Add a transition to the list of transitions. If a transition with the same token
 ### void OverwriteTransition(ITransition\<T\> transition)
 
 Same as `AddTransition` but overwrites the existing transition if one with the same token already exists.
+
+### void ClearTransitions()
+
+Clear all transitions from the state. This method keeps the default transition.
+
+### void GetTransitionsCount()
+
+Get the number of transitions from the state. The total count does not include the default transition.
+
+### IEnumerable\<T\> GetTransitions()
+
+Get a list of tokens that lead to actual transitions once read. Tokens to default transition are not included in the list.
+
+### ITransition\<T\>? GetTransition(T token)
+
+Get the transition triggered when the given token is read. Returns null if no transition is found.
 
 ### IState\<T\> SetDefault(ITransition\<T\> transition)
 
@@ -106,7 +124,52 @@ When a token is read and no transition is found, the following methods are calle
 6. The `Activate` method of the default state is called.
 
 
-## Customisable states
+
+## Advanced features
+
+### Evolutive states
+
+Sometimes the number and nature of transitions cannot be predicted before the state is reached.
+The following patterns explain how to dynamically add or remove transitions from a state when it is reached.
+
+#### 1. Subscribe to the `Reach` or `Activated` event of the state
+
+The event `Reach` is raised before any action is performed, and the event `Activated` is raised after the action is performed.
+Following the scenario, you must subscribe to one of these events.
+
+```csharp
+var state = new State<int>();
+state.Reach += OnStateReached;
+```
+
+#### 2. Edit the transitions from the event handler
+
+Define the logic to add or remove transitions from the state in the event handler. For that, use these methods:
+- `AddTransition` to add a transition to the state.
+- `OverwriteTransition` to add a transition to the state and overwrite an existing one if it exists.
+- `ClearTransitions` to remove all transitions from the state.
+- `GetTransition` to get a specific transition from the state.
+
+```csharp
+private OnStateReached(object? sender, TransitionEventArgs<int> e) {
+   var state = e.Transition.Target;
+
+   # edit transitions, using commands like
+   state.ClearTransitions();
+
+   # followed by
+   state.AddTransition(new Transition(...)):
+
+   # or
+   state.OverwriteTransition(new Transition(...));
+
+   # or
+   state.GetTransition(...)?.SetAction(...);
+
+}
+```
+
+### Customisable states
 
 In addition to the existing states, you can override the default behavior by implementing the `Nt.Automaton.States.State` class, or create a new state from scratch by implementing the `Nt.Automaton.States.IState` interface.
 

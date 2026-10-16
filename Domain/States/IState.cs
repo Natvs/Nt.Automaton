@@ -30,6 +30,30 @@ namespace Nt.Automaton.States
         void OverwriteTransition(ITransition<T> transition);
 
         /// <summary>
+        /// Clear all the transitions from this state (excluding the default one).
+        /// </summary>
+        void ClearTransitions();
+
+        /// <summary>
+        /// Obtain the count of transitions, excluding the default one.
+        /// </summary>
+        /// <returns>The total count of transitions</returns>
+        int GetTransitionsCount();
+
+        /// <summary>
+        /// List all tokens that would trigger a transition when read.
+        /// </summary>
+        /// <returns>A list of tokens that can be read</returns>
+        IEnumerable<T> ListTransitions();
+
+        /// <summary>
+        /// Get a transition corresponding to a token.
+        /// </summary>
+        /// <param name="token">The token that triggers the transition</param>
+        /// <returns>The transition triggered by the token</returns>
+        ITransition<T>? GetTransition(T token);
+
+        /// <summary>
         /// Reads a token and gets the next state
         /// </summary>
         /// <param name="token">Automaton token to read</param>
@@ -38,7 +62,7 @@ namespace Nt.Automaton.States
         /// <exception cref="NoDefaultStateException">It might be that no default state was set for this state</exception>
         IState<T> Read(IAutomatonToken<T> token);
 
-        // Methods for decorators
+        // Decorative methods
 
         /// <summary>
         /// Sets an action to be performed when this state is reached.

@@ -51,7 +51,35 @@ namespace Nt.Automaton.States
             }
             Transitions.Add(transition);
         }
+        public void ClearTransitions()
+        {
+            Transitions.Clear();
+        }
 
+        public int GetTransitionsCount()
+        {
+            return Transitions.Count;
+        }
+        public IEnumerable<T> ListTransitions()
+        {
+            var tokens = new HashSet<T>();
+            foreach (var transition in Transitions)
+            {
+                tokens.Add(transition.Token.Value);
+            }
+            return tokens;
+        }
+        public ITransition<T>? GetTransition(T token)
+        {
+            foreach (var transition in Transitions)
+            {
+                if (transition.Accepts(new AutomatonToken<T>(token)))
+                {
+                    return transition;
+                }
+            }
+            return null;
+        }
         public IState<T> Read(IAutomatonToken<T> token)
         {
             foreach (var transition in Transitions)

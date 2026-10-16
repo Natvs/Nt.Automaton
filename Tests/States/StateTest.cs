@@ -47,6 +47,71 @@ namespace Nt.Tests.Automaton.States
             Assert.Equal(second, new_state);
         }
 
+        // Information about transitions
+
+        [Fact]
+        public void State_GetTransitionsCount_ShouldReturnTheNumberOfTransitions()
+        {
+            var initial = new State<string>();
+            var second = new State<string>();
+
+            initial.AddTransition(new Transition<string>("a", second));
+            initial.AddTransition(new Transition<string>("b", second));
+
+            Assert.Equal(2, initial.GetTransitionsCount());
+        }
+
+        [Fact]
+        public void State_ClearTransitions_ShouldntContainAnyTransition()
+        {
+            var initial = new State<string>();
+            var second = new State<string>();
+
+            initial.AddTransition(new Transition<string>("a", second));
+            initial.AddTransition(new Transition<string>("b", second));
+            initial.ClearTransitions();
+
+            Assert.Equal(0, initial.GetTransitionsCount());
+        }
+
+        [Fact]
+        public void State_ListTransitions_ShouldContainTokens()
+        {
+            var initial = new State<string>();
+            var second = new State<string>();
+
+            initial.AddTransition(new Transition<string>("a", second));
+            initial.AddTransition(new Transition<string>("b", second));         
+            var tokens = initial.ListTransitions();
+
+            Assert.Contains("a", tokens);
+            Assert.Contains("b", tokens);
+        }
+
+        [Fact]
+        public void State_GetTransition_ShouldReturnTheTransition()
+        {
+            var initial = new State<string>();
+            var second = new State<string>();
+            var token = new AutomatonToken<string>("a");
+            var transition = new Transition<string>(token, second);
+
+            initial.AddTransition(transition);
+            var retrieved_transition = initial.GetTransition(token.Value);
+
+            Assert.Equal(transition, retrieved_transition);
+        }
+
+        [Fact]
+        public void State_GetTransition_ShouldReturnNullIfNotFound()
+        {
+            var initial = new State<string>();
+
+            var retrieved_transition = initial.GetTransition("a");
+
+            Assert.Null(retrieved_transition);
+        }
+
         // Events
 
         [Fact]
