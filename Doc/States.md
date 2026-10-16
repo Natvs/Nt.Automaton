@@ -28,6 +28,22 @@ Add a transition to the list of transitions. If a transition with the same token
 
 Same as `AddTransition` but overwrites the existing transition if one with the same token already exists.
 
+### void ClearTransitions()
+
+Clear all transitions from the state. This method keeps the default transition.
+
+### void GetTransitionsCount()
+
+Get the number of transitions from the state. The total count does not include the default transition.
+
+### IEnumerable\<T\> GetTransitions()
+
+Get a list of tokens that lead to actual transitions once read. Tokens to default transition are not included in the list.
+
+### ITransition\<T\>? GetTransitio(T token)
+
+Get the transition triggered when the given token is read. Returns null if no transition is found.
+
 ### IState\<T\> SetDefault(ITransition\<T\> transition)
 
 Set a transition to use when no transitions are valid.
