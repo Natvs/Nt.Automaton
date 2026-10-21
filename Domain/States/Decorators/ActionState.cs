@@ -35,6 +35,10 @@ namespace Nt.Automaton.States.Decorators
 
         public void AddTransition(ITransition<T> transition) => State.AddTransition(transition);
         public void OverwriteTransition(ITransition<T> transition) => State.OverwriteTransition(transition);
+        public void ClearTransitions() => State.ClearTransitions();
+        public int GetTransitionsCount() => State.GetTransitionsCount();
+        public IEnumerable<T> ListTransitions() => State.ListTransitions();
+        public ITransition<T>? GetTransition(T token) => State.GetTransition(token);
 
         public IState<T> Read(IAutomatonToken<T> token) => State.Read(token);
 
@@ -62,5 +66,6 @@ namespace Nt.Automaton.States.Decorators
             State.Deactivate();
             Deactivated?.Invoke(this, EventArgs.Empty);
         }
+
     }
 }
