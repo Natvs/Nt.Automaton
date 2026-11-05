@@ -30,6 +30,19 @@ namespace Nt.Tests.Automaton.Transitions
 
             Assert.False(accepted);
         }
+
+        [Fact]
+        public void Transition_Accept_OnCondition()
+        {
+            var token = new AutomatonToken<int>(1);
+            var target = new State<int>();
+            var condition_met = false;
+            var transition = new Transition<int>(token, target).OnCondition(() => condition_met);
+
+            Assert.False(transition.Accepts(token));
+            condition_met = true;
+            Assert.True(transition.Accepts(token));
+        }
         
         // Events
 
