@@ -93,7 +93,7 @@ namespace Nt.Automaton.States
             return TargetNewState(DefaultTransition, token);
         }
 
-        protected virtual IState<T> TargetNewState(ITransition<T> transition, IAutomatonToken<T> token)
+        private IState<T> TargetNewState(ITransition<T> transition, IAutomatonToken<T> token)
         {
             var args = new TransitionEventArgs<T>(transition);
 
