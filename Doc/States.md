@@ -67,10 +67,6 @@ Set the state as a final state.
 
 Returns: A new state with the final flag set.
 
-### IFinalState\<T\> OnCondition(Func\<bool\> condition)
-
-The behavior of this method depends of the type of the state and will be described below.
-
 ### void Activate()
 
 Activate the state. When an action is linked to a state, this method performs the action.
