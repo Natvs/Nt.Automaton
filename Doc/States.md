@@ -3,6 +3,7 @@
 - [Structure](#structure)
 - [Methods](#methods)
 - [Events](#events)
+- [Creating states](#creating-states)
 - [Stating conditions to states](#stating-conditions-to-states)
 	- [Example](#example)
 	- [Combining conditions](#combining-conditions)
@@ -25,11 +26,13 @@ The complete API description is available below.
 
 ## Methods
 
-### void AddTransition(ITransition\<T\> transition)
+### IState\<T\> AddTransition(ITransition\<T\> transition)
 
 Add a transition to the list of transitions. If a transition with the same token already exists, the already existing transition has priority over this one.
 
-### void OverwriteTransition(ITransition\<T\> transition)
+Returns: The current state
+
+### IState\<T\> OverwriteTransition(ITransition\<T\> transition)
 
 Same as `AddTransition` but overwrites the existing transition if one with the same token already exists.
 
@@ -49,23 +52,18 @@ Get a list of tokens that lead to actual transitions once read. Tokens to defaul
 
 Get the transition triggered when the given token is read. Returns null if no transition is found.
 
+
 ### IState\<T\> SetDefault(ITransition\<T\> transition)
 
 Set a transition to use when no transitions are valid.
-
-Returns: The current state.
 
 ### IActionState\<T\> SetAction(ITokenAction\<T\> action)
 
 Set an action to perform when the state is reached. 
 
-Returns: A new new state with the action set.
-
 ### IFinalState\<T\> SetFinal()
 
 Set the state as a final state.
-
-Returns: A new state with the final flag set.
 
 ### void Activate()
 
@@ -78,8 +76,6 @@ Deactivate the state.
 ### IState\<T\> Read(IAutomatonToken\<T\> token)
 
 Read a token and return the target state of the first matching transition, or the default one if there is no such transition.
-
-Returns: The target state of the transition, or the default one if there is no such transition.
 
 ## Events
 
@@ -117,6 +113,52 @@ When a token is read and no transition is found, the following methods are calle
 4. The default action is performed, if any.
 5. The event `Reach` is raised from the default state.
 6. The `Activate` method of the default state is called.
+
+## Creating states
+
+Some methods are designed for chaining when creating states. Some of these chaining method DO NOT apply modifications to the state, but instead return a new one.
+
+The methods returning a new state are:
+- `SetAction` returns an `IActionState<T>` instance.
+- `SetFinal` returns an `IFinalState<T>` instance.
+
+As a consequence, it is recommended to call all the chaining methods needed when declaring the state:
+
+```csharp
+var state = new State<int>()
+	.SetDefault(new MyDefaultTransition())
+	.AddTransition(new MyTransition())o
+	.SetAction(new MyAction())
+	.SetFinal();
+```
+
+> Here state will be of type `IFinalState<int>` as `SetFinal` is the last method called.
+
+If this is not possible, you can store the returned state in a variable and call the next method on it:
+
+```csharp
+var state = new State<int>()
+	.SetDefault(new MyDefaultTransition())
+	.AddTransition(new MyTransition());
+
+var actionState = state.SetAction(new MyAction());
+var finalState = actionState.SetFinal();
+```
+
+Here `actionState` is not marked as final, but `finalState` is and contains an action. 
+The original `state` variable is not marked as final either nor contains any action. But all states contain the same transitions and default transitions.
+
+To keep things simple, you can just define one state variable `state`:
+
+```csharp
+var state = new State<int>()
+	.SetDefault(new MyDefaultTransition())
+	.AddTransition(new MyTransition());
+
+state = state.SetAction(new MyAction());
+state = state.SetFinal();
+```
+
 
 ## Stating conditions to states
 The type of state can be conditionned and dependent on the runtime environment. For example, a state can be set as final only if a certain condition is met.

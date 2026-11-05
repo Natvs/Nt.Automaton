@@ -34,11 +34,12 @@ namespace Nt.Automaton.States
             return new FinalState<T>(this);
         }
 
-        public void AddTransition(ITransition<T> transition)
+        public IState<T> AddTransition(ITransition<T> transition)
         {
             Transitions.Add(transition);
+            return this;
         }
-        public void OverwriteTransition(ITransition<T> transition)
+        public IState<T> OverwriteTransition(ITransition<T> transition)
         {
             List<ITransition<T>> toRemove = [];
             foreach (var t in Transitions)
@@ -50,6 +51,7 @@ namespace Nt.Automaton.States
                 Transitions.Remove(t);
             }
             Transitions.Add(transition);
+            return this;
         }
         public void ClearTransitions()
         {
