@@ -26,7 +26,7 @@ namespace Nt.Automaton.Transitions
         IActionTransition<T> SetAction(ITokenAction<T> action);
 
         /// <summary>
-        /// Triggers this transition with the given token.
+        /// Trigger this transition with the given token.
         /// </summary>
         /// <param name="token">The token to trigger the transition with</param>
         void Trigger(IAutomatonToken<T> token);

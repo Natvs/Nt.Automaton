@@ -12,6 +12,7 @@ namespace Nt.Automaton.Transitions.Decorators
         public ITransition<T> Transition => transition;
 
         public ITokenAction<T> Action { get; private set; } = action;
+        private Func<bool> condition = () => true;
 
         public bool Accepts(IAutomatonToken<T> token) => Transition.Accepts(token);
 
@@ -21,9 +22,16 @@ namespace Nt.Automaton.Transitions.Decorators
             return this;
         }
 
+        public IActionTransition<T> OnCondition(Func<bool> condition)
+        {
+            this.condition = condition;
+            return this;
+        }
+
+
         public void Trigger(IAutomatonToken<T> token)
         {
-            Action.Perform(token);
+            if (condition()) Action.Perform(token);
             Transition.Trigger(token);
             Triggered?.Invoke(this, new TokenEventArgs<T>(token));
         }
