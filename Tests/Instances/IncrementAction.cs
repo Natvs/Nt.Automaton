@@ -1,7 +1,7 @@
 ﻿using Nt.Automaton.Actions;
 using Nt.Automaton.Tokens;
 
-namespace Nt.Tests.Automaton.Automatons.Instances
+namespace Nt.Tests.Automaton.Instances
 {
     internal class IncrementAction : IAction, ITokenAction<string>
     {

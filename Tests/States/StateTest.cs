@@ -1,6 +1,7 @@
 ﻿using Nt.Automaton.States;
 using Nt.Automaton.Tokens;
 using Nt.Automaton.Transitions;
+using Nt.Tests.Automaton.Instances;
 
 namespace Nt.Tests.Automaton.States
 {
@@ -200,5 +201,53 @@ namespace Nt.Tests.Automaton.States
             Assert.Equal(3, activated);
         }
 
+        // Actions 
+
+        [Fact]
+        public void State_PerformAction_OnDefaultTransition()
+        {
+            var action = new IncrementAction();
+            var initital = new State<int>();
+            var second = new State<int>().SetAction(action);
+
+            initital.SetDefault(new Transition<int>(second));
+            initital.Read(new AutomatonToken<int>(1));
+
+            Assert.Equal(1, action.Count);
+        }
+
+        [Fact]
+        public void State_PerformActionWithCondition_OnDefaultTransition()
+        {
+            var condition_met = false;
+            var action = new IncrementAction();
+            var initital = new State<int>();
+            var second = new State<int>().SetAction(action).OnCondition(() => condition_met);
+            var token = new AutomatonToken<int>(1);
+
+            initital.SetDefault(new Transition<int>(second));
+            initital.Read(token);
+
+            Assert.Equal(0, action.Count);
+
+            condition_met = true;
+            initital.Read(token);
+
+            Assert.Equal(1, action.Count);
+        }
+
+        [Fact]
+        public void State_PerformAction_OnTransition()
+        {
+            var action = new IncrementAction();
+            var initital = new State<int>();
+            var second = new State<int>().SetAction(action);
+            var token = new AutomatonToken<int>(1);
+
+            initital.AddTransition(new Transition<int>(token, second));
+            initital.Read(token);
+
+            Assert.Equal(1, action.Count);
+        }
     }
 }

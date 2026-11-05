@@ -2,8 +2,7 @@
 using Nt.Automaton.States;
 using Nt.Automaton.Tokens;
 using Nt.Automaton.Transitions;
-using Nt.Tests.Automaton.Automatons.Instances;
-
+using Nt.Tests.Automaton.Instances;
 using static Nt.Tests.Automaton.Automatons.AutomatonUtils;
 
 namespace Nt.Tests.Automaton.Automatons
