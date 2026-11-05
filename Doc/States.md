@@ -3,6 +3,9 @@
 - [Structure](#structure)
 - [Methods](#methods)
 - [Events](#events)
+- [Stating conditions to states](#stating-conditions-to-states)
+	- [Example](#example)
+	- [Combining conditions](#combining-conditions)
 - [Workflow](#workflow)
 - [Advanced features](#advanced-features)
 	- [Evolutive states](#evolutive-states)
@@ -56,8 +59,6 @@ Returns: The current state.
 
 Set an action to perform when the state is reached. 
 
-If auto_perform is true, the action is performed when the state is reached.
-
 Returns: A new new state with the action set.
 
 ### IFinalState\<T\> SetFinal()
@@ -68,9 +69,7 @@ Returns: A new state with the final flag set.
 
 ### IFinalState\<T\> OnCondition(Func\<bool\> condition)
 
-This method is only available on final states. It sets a condition to check when the state is reached. If the condition returns false, the state is not considered as reached.
-
-Returns: The current final state.
+The behavior of this method depends of the type of the state and will be described below.
 
 ### void Activate()
 
@@ -123,7 +122,34 @@ When a token is read and no transition is found, the following methods are calle
 5. The event `Reach` is raised from the default state.
 6. The `Activate` method of the default state is called.
 
+## Stating conditions to states
+The type of state can be conditionned and dependent on the runtime environment. For example, a state can be set as final only if a certain condition is met.
 
+For that purpose, the method `OnCondition` is provided. It takes a function returning a boolean as parameter. The behavior of this method depends on the method called before it.
+
+After calling `SetAction`, the method `OnCondition` sets a condition for the action to be executed.
+
+After calling `SetFinal`, the method `OnCondition` sets a condition for the state to be considered as final.
+
+### Example
+Here is an example of an action performed only if the score of the player is greater than 1000:
+
+```csharp
+var state = new State<int>().SetAction(new MyAction()).OnCondition(() => player.Score > 1000);
+```
+
+In this example, the action `MyAction` will be executed only if the player has a score of 1000 or greater.
+
+### Combining conditions
+You can combine conditions for actions and final states by following each correponding method with a `OnCondition` call.
+
+```csharp
+var state = new State<int>()
+	.SetAction(new MyAction()).OnCondition(() => player.Score > 1000)
+	.SetFinal().OnCondition(() => player.Level == 10);
+```
+
+The action will be performed only if the player has a score of 1000 or greater, and the state will be considered as final only if the player is at level 10.
 
 ## Advanced features
 
