@@ -53,6 +53,7 @@ namespace Nt.Automaton.States
             var tokens = new HashSet<T>();
             foreach (var transition in Transitions)
             {
+                if (transition.Token is null) continue;
                 tokens.Add(transition.Token.Value);
             }
             return tokens;

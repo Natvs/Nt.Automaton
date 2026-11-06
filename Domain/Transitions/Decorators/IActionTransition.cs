@@ -10,6 +10,6 @@ namespace Nt.Automaton.Transitions.Decorators
         /// Set a condition for the action to be executed when this transition is triggered.
         /// </summary>
         /// <param name="condition">A function that returns a boolean indicating if the action should be executed</param>
-        new IActionTransition<T> OnCondition(Func<bool> condition);
+        IActionTransition<T> OnCondition(Func<bool> condition);
     }
 }

@@ -3,6 +3,7 @@
 - [Structure](#structure)
 - [Methods](#methods)
 - [Events](#events)
+- [Taking a transition](#taking-a-transition)
 - [Adding conditions to transitions](#adding-conditions-to-transitions)
     - [OnCondition after a constructor](#oncondition-after-a-constructor)
     - [OnCondition after setting an action](#oncondition-after-setting-an-action)
