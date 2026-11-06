@@ -34,22 +34,10 @@ namespace Nt.Automaton.States
             return new FinalState<T>(this);
         }
 
-        public void AddTransition(ITransition<T> transition)
+        public IState<T> AddTransition(ITransition<T> transition)
         {
             Transitions.Add(transition);
-        }
-        public void OverwriteTransition(ITransition<T> transition)
-        {
-            List<ITransition<T>> toRemove = [];
-            foreach (var t in Transitions)
-            {
-                if (t.Accepts(transition.Token)) toRemove.Add(t);
-            }
-            foreach (var t in toRemove)
-            {
-                Transitions.Remove(t);
-            }
-            Transitions.Add(transition);
+            return this;
         }
         public void ClearTransitions()
         {
@@ -65,6 +53,7 @@ namespace Nt.Automaton.States
             var tokens = new HashSet<T>();
             foreach (var transition in Transitions)
             {
+                if (transition.Token is null) continue;
                 tokens.Add(transition.Token.Value);
             }
             return tokens;
@@ -93,7 +82,7 @@ namespace Nt.Automaton.States
             return TargetNewState(DefaultTransition, token);
         }
 
-        protected virtual IState<T> TargetNewState(ITransition<T> transition, IAutomatonToken<T> token)
+        private IState<T> TargetNewState(ITransition<T> transition, IAutomatonToken<T> token)
         {
             var args = new TransitionEventArgs<T>(transition);
 

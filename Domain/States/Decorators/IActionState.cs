@@ -6,6 +6,6 @@ namespace Nt.Automaton.States.Decorators
 {
     public interface IActionState<T>: IState<T>
     {
-
+        public IActionState<T> OnCondition(Func<bool> condition);
     }
 }

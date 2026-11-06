@@ -13,11 +13,11 @@ namespace Nt.Automaton.Transitions
     /// <typeparam name="T"></typeparam>
     /// <param name="value">The value that triggers the transition</param>
     /// <param name="newState">The state to which the transition leads when the specified value is read</param>
-    public class Transition<T> : ITransition<T>
+    public class Transition<T> : ITransition<T>, IConditionalTransition<T>
     {
         public Transition(IState<T> newState)
         {
-            Token = new AutomatonToken<T>(default!);
+            Token = null;
             Target = newState;
         }
 
@@ -33,12 +33,19 @@ namespace Nt.Automaton.Transitions
             Target = newState;
         }
 
-        public IAutomatonToken<T> Token { get; }
+        private Func<bool> condition = () => true;
+        public IAutomatonToken<T>? Token { get; }
         public IState<T> Target { get; }
 
+        public ITransition<T> OnCondition(Func<bool> condition)
+        {
+            this.condition = condition;
+            return this;
+        }
         public bool Accepts(IAutomatonToken<T> token)
         {
-            if (Token.Value is null) return false;
+            if (!condition()) return false;
+            if (Token == null || Token.Value == null) return true;
             return Token.Value.Equals(token.Value);
         }
 

@@ -161,7 +161,7 @@ Automaton.CurrentState.Activate();
 ```
 
 However, if you just wish to store this state on the stack without triggering its action, you can just use the `Push` method.
-This can be useful when you want to store intermediate states on the stach without triggering their actions, and then return to them later by popping them.
+This can be useful when you want to store intermediate states on the stack without triggering their actions, and then return to them later by popping them.
 
 The same applies for popping a state from the stack. If you want to pop a state and trigger the action, you should do so:
 ```csharp

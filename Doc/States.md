@@ -3,6 +3,10 @@
 - [Structure](#structure)
 - [Methods](#methods)
 - [Events](#events)
+- [Creating states](#creating-states)
+- [Stating conditions to states](#stating-conditions-to-states)
+	- [Example](#example)
+	- [Combining conditions](#combining-conditions)
 - [Workflow](#workflow)
 - [Advanced features](#advanced-features)
 	- [Evolutive states](#evolutive-states)
@@ -11,7 +15,7 @@
 ## Structure
 
 All states have common features
-- Two methods `AddTransition` and `OverwriteTransition` to add transitions from this state to an other state.
+- A method `AddTransition` to add transitions from this state to an other state.
 - A method `SetDefault` to set the default transition used when no transitions are valid.
 - A method `SetAction` to set the action linked to the state.
 - Two methods `Activate` and `Deactivate` to control the state's activity.
@@ -22,13 +26,9 @@ The complete API description is available below.
 
 ## Methods
 
-### void AddTransition(ITransition\<T\> transition)
+### IState\<T\> AddTransition(ITransition\<T\> transition)
 
 Add a transition to the list of transitions. If a transition with the same token already exists, the already existing transition has priority over this one.
-
-### void OverwriteTransition(ITransition\<T\> transition)
-
-Same as `AddTransition` but overwrites the existing transition if one with the same token already exists.
 
 ### void ClearTransitions()
 
@@ -46,31 +46,18 @@ Get a list of tokens that lead to actual transitions once read. Tokens to defaul
 
 Get the transition triggered when the given token is read. Returns null if no transition is found.
 
+
 ### IState\<T\> SetDefault(ITransition\<T\> transition)
 
 Set a transition to use when no transitions are valid.
-
-Returns: The current state.
 
 ### IActionState\<T\> SetAction(ITokenAction\<T\> action)
 
 Set an action to perform when the state is reached. 
 
-If auto_perform is true, the action is performed when the state is reached.
-
-Returns: A new new state with the action set.
-
 ### IFinalState\<T\> SetFinal()
 
 Set the state as a final state.
-
-Returns: A new state with the final flag set.
-
-### IFinalState\<T\> OnCondition(Func\<bool\> condition)
-
-This method is only available on final states. It sets a condition to check when the state is reached. If the condition returns false, the state is not considered as reached.
-
-Returns: The current final state.
 
 ### void Activate()
 
@@ -83,8 +70,6 @@ Deactivate the state.
 ### IState\<T\> Read(IAutomatonToken\<T\> token)
 
 Read a token and return the target state of the first matching transition, or the default one if there is no such transition.
-
-Returns: The target state of the transition, or the default one if there is no such transition.
 
 ## Events
 
@@ -123,7 +108,80 @@ When a token is read and no transition is found, the following methods are calle
 5. The event `Reach` is raised from the default state.
 6. The `Activate` method of the default state is called.
 
+## Creating states
 
+Some methods are designed for chaining when creating states. Some of these chaining method DO NOT apply modifications to the state, but instead return a new one.
+
+The methods returning a new state are:
+- `SetAction` returns an `IActionState<T>` instance.
+- `SetFinal` returns an `IFinalState<T>` instance.
+
+As a consequence, it is recommended to call all the chaining methods needed when declaring the state:
+
+```csharp
+var state = new State<int>()
+	.SetDefault(new MyDefaultTransition())
+	.AddTransition(new MyTransition())o
+	.SetAction(new MyAction())
+	.SetFinal();
+```
+
+> Here state will be of type `IFinalState<int>` as `SetFinal` is the last method called.
+
+If this is not possible, you can store the returned state in a variable and call the next method on it:
+
+```csharp
+var state = new State<int>()
+	.SetDefault(new MyDefaultTransition())
+	.AddTransition(new MyTransition());
+
+var actionState = state.SetAction(new MyAction());
+var finalState = actionState.SetFinal();
+```
+
+Here `actionState` is not marked as final, but `finalState` is and contains an action. 
+The original `state` variable is not marked as final either nor contains any action. But all states contain the same transitions and default transitions.
+
+To keep things simple, you can just define one state variable `state`:
+
+```csharp
+var state = new State<int>()
+	.SetDefault(new MyDefaultTransition())
+	.AddTransition(new MyTransition());
+
+state = state.SetAction(new MyAction());
+state = state.SetFinal();
+```
+
+
+## Stating conditions to states
+The type of state can be conditionned and dependent on the runtime environment. For example, a state can be set as final only if a certain condition is met.
+
+For that purpose, the method `OnCondition` is provided. It takes a function returning a boolean as parameter. The behavior of this method depends on the method called before it.
+
+After calling `SetAction`, the method `OnCondition` sets a condition for the action to be executed.
+
+After calling `SetFinal`, the method `OnCondition` sets a condition for the state to be considered as final.
+
+### Example
+Here is an example of an action performed only if the score of the player is greater than 1000:
+
+```csharp
+var state = new State<int>().SetAction(new MyAction()).OnCondition(() => player.Score > 1000);
+```
+
+In this example, the action `MyAction` will be executed only if the player has a score of 1000 or greater.
+
+### Combining conditions
+You can combine conditions for actions and final states by following each correponding method with a `OnCondition` call.
+
+```csharp
+var state = new State<int>()
+	.SetAction(new MyAction()).OnCondition(() => player.Score > 1000)
+	.SetFinal().OnCondition(() => player.Level == 10);
+```
+
+The action will be performed only if the player has a score of 1000 or greater, and the state will be considered as final only if the player is at level 10.
 
 ## Advanced features
 
@@ -159,9 +217,6 @@ private OnStateReached(object? sender, TransitionEventArgs<int> e) {
 
    # followed by
    state.AddTransition(new Transition(...)):
-
-   # or
-   state.OverwriteTransition(new Transition(...));
 
    # or
    state.GetTransition(...)?.SetAction(...);

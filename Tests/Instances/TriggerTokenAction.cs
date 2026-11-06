@@ -1,7 +1,7 @@
 ﻿using Nt.Automaton.Actions;
 using Nt.Automaton.Tokens;
 
-namespace Nt.Tests.Automaton.Transitions.Instances
+namespace Nt.Tests.Automaton.Instances
 {
     public class TriggerTokenAction<T> : ITokenAction<T>
     {

@@ -28,9 +28,19 @@ namespace Nt.Automaton.States.Decorators
         }
 
         public IState<T> SetDefault(ITransition<T> transition) => State.SetDefault(transition);
+        public IActionState<T> SetAction(IAction action) => State.SetAction(action);
+        public IFinalState<T> SetFinal()
+        {
+            Condition = () => true;
+            return this;
+        }
+        public IFinalState<T> OnCondition(Func<bool> condition)
+        {
+            Condition = condition;
+            return this;
+        }
 
-        public void AddTransition(ITransition<T> transition) => State.AddTransition(transition);
-        public void OverwriteTransition(ITransition<T> transition) => State.OverwriteTransition(transition);
+        public IState<T> AddTransition(ITransition<T> transition) => State.AddTransition(transition);
         public void ClearTransitions() => State.ClearTransitions();
         public int GetTransitionsCount() => State.GetTransitionsCount();
         public IEnumerable<T> ListTransitions() => State.ListTransitions();
@@ -39,25 +49,12 @@ namespace Nt.Automaton.States.Decorators
 
         public IState<T> Read(IAutomatonToken<T> token) => State.Read(token);
 
-        public IActionState<T> SetAction(IAction action) => State.SetAction(action);
-        public IFinalState<T> SetFinal()
-        {
-            Condition = () => true;
-            return this;
-        }
-
-        public IFinalState<T> OnCondition(Func<bool> condition)
-        {
-            Condition = condition;
-            return this;
-        }
+        // Events
 
         public void Activate() => State.Activate();
-
         public void Deactivate() => State.Deactivate();
 
         public void OnReach(TransitionEventArgs<T> args) => State.OnReach(args);
-
         public void OnLeave(TransitionEventArgs<T> args) => State.OnLeave(args);
 
     }

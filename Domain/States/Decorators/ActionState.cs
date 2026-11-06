@@ -15,14 +15,19 @@ namespace Nt.Automaton.States.Decorators
         private IState<T> State { get; }
 
         public IAction Action { get; private set; }
+        private Func<bool> Condition = () => true;
         public bool IsFinal => State.IsFinal;
 
         public ActionState(IState<T> state, IAction action) {
             State = state;
             Action = action;
 
-            State.Leave += (sender, args) => { OnLeave(args); };
-            State.Reach += (sender, args) => { OnReach(args); };
+            State.Activated += (sender, args) => { Activated?.Invoke(this, args); };
+            State.Deactivated += (sender, args) => { Deactivated?.Invoke(this, args); };
+            State.Leave += (sender, args) => { Leave?.Invoke(this, args); };
+            State.Reach += (sender, args) => { Reach?.Invoke(this, args); };
+
+            State.Activated += (sender, args) => { if (Condition()) Action.Perform(); };
         }
 
         public IState<T> SetDefault(ITransition<T> transition) => State.SetDefault(transition);
@@ -31,10 +36,14 @@ namespace Nt.Automaton.States.Decorators
             Action = action;
             return this;
         }
+        public IActionState<T> OnCondition(Func<bool> condition)
+        {
+            Condition = condition;
+            return this;
+        }
         public IFinalState<T> SetFinal() => new FinalState<T>(this);
 
-        public void AddTransition(ITransition<T> transition) => State.AddTransition(transition);
-        public void OverwriteTransition(ITransition<T> transition) => State.OverwriteTransition(transition);
+        public IState<T> AddTransition(ITransition<T> transition) => State.AddTransition(transition);
         public void ClearTransitions() => State.ClearTransitions();
         public int GetTransitionsCount() => State.GetTransitionsCount();
         public IEnumerable<T> ListTransitions() => State.ListTransitions();
@@ -44,28 +53,11 @@ namespace Nt.Automaton.States.Decorators
 
         // Events
 
-        public void OnReach(TransitionEventArgs<T> args)
-        {
-            Reach?.Invoke(this, args);
-            Activate();
-        }
-        public void OnLeave(TransitionEventArgs<T> args)
-        {
-            Deactivate();
-            Leave?.Invoke(this, args);
-        }
+        public void Activate() => State.Activate();
+        public void Deactivate() => State.Deactivate();
 
-        public void Activate()
-        {
-            Action.Perform();
-            State.Activate();
-            Activated?.Invoke(this, EventArgs.Empty);
-        }
-        public void Deactivate()
-        {
-            State.Deactivate();
-            Deactivated?.Invoke(this, EventArgs.Empty);
-        }
+        public void OnReach(TransitionEventArgs<T> args) => State.OnReach(args);
+        public void OnLeave(TransitionEventArgs<T> args) => State.OnLeave(args);
 
     }
 }

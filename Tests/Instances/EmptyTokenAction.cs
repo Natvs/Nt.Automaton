@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Nt.Tests.Automaton.Transitions.Instances
+namespace Nt.Tests.Automaton.Instances
 {
     public class EmptyTokenAction<T> : ITokenAction<T>
     {
