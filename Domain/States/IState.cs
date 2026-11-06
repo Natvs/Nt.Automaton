@@ -24,12 +24,6 @@ namespace Nt.Automaton.States
         IState<T> AddTransition(ITransition<T> transition);
 
         /// <summary>
-        /// Replaces any existing transition with the same value by the new transition.
-        /// </summary>
-        /// <param name="transition">The transition to add or overwrite in the collection.</param>
-        IState<T> OverwriteTransition(ITransition<T> transition);
-
-        /// <summary>
         /// Clear all the transitions from this state (excluding the default one).
         /// </summary>
         void ClearTransitions();

@@ -8,7 +8,7 @@ namespace Nt.Automaton.Transitions
 {
     public interface ITransition<T>
     {
-        IAutomatonToken<T> Token { get; }
+        IAutomatonToken<T>? Token { get; }
         IState<T> Target { get; }
 
         /// <summary>

@@ -44,7 +44,6 @@ namespace Nt.Automaton.States.Decorators
         public IFinalState<T> SetFinal() => new FinalState<T>(this);
 
         public IState<T> AddTransition(ITransition<T> transition) => State.AddTransition(transition);
-        public IState<T> OverwriteTransition(ITransition<T> transition) => State.OverwriteTransition(transition);
         public void ClearTransitions() => State.ClearTransitions();
         public int GetTransitionsCount() => State.GetTransitionsCount();
         public IEnumerable<T> ListTransitions() => State.ListTransitions();

@@ -123,7 +123,7 @@ A particularity of `Nt.Automaton` is that components are largely customisable, i
 
 Two implementations already exists:
 - `Nt.Automaton.Automatons.StateAutomaton` : Ideal for a single state automaton, where only one state is active at a time.
-- `Nt.Automaton.Automatons.StackAutomaton` : Ideal for a signle 
+- `Nt.Automaton.Automatons.StackAutomaton` : Ideal for a single state automaton that must handle an historic of the states encountered 
 
 See the [automatons documentation](Doc/Automaton.md) for more details.
 

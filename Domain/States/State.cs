@@ -39,20 +39,6 @@ namespace Nt.Automaton.States
             Transitions.Add(transition);
             return this;
         }
-        public IState<T> OverwriteTransition(ITransition<T> transition)
-        {
-            List<ITransition<T>> toRemove = [];
-            foreach (var t in Transitions)
-            {
-                if (t.Accepts(transition.Token)) toRemove.Add(t);
-            }
-            foreach (var t in toRemove)
-            {
-                Transitions.Remove(t);
-            }
-            Transitions.Add(transition);
-            return this;
-        }
         public void ClearTransitions()
         {
             Transitions.Clear();

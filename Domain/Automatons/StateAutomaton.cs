@@ -12,7 +12,6 @@ namespace Nt.Automaton.Automatons
     /// <param name="initialState">Initial state of the automaton</param>
     public class StateAutomaton<T>(IState<T> initialState) : IAutomaton<T>
     {
-        private IState<T> InitialState { get; } = initialState;
         public IState<T> CurrentState { get; private set; } = initialState;
         public bool IsValid => CurrentState.IsFinal;
 

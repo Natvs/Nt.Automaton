@@ -17,7 +17,7 @@ namespace Nt.Automaton.Transitions
     {
         public Transition(IState<T> newState)
         {
-            Token = new AutomatonToken<T>(default!);
+            Token = null;
             Target = newState;
         }
 
@@ -34,7 +34,7 @@ namespace Nt.Automaton.Transitions
         }
 
         private Func<bool> condition = () => true;
-        public IAutomatonToken<T> Token { get; }
+        public IAutomatonToken<T>? Token { get; }
         public IState<T> Target { get; }
 
         public ITransition<T> OnCondition(Func<bool> condition)
@@ -44,8 +44,9 @@ namespace Nt.Automaton.Transitions
         }
         public bool Accepts(IAutomatonToken<T> token)
         {
-            if (Token.Value is null) return false;
-            return condition() && Token.Value.Equals(token.Value);
+            if (!condition()) return false;
+            if (Token == null || Token.Value == null) return true;
+            return Token.Value.Equals(token.Value);
         }
 
         public IActionTransition<T> SetAction(ITokenAction<T> action)

@@ -15,7 +15,7 @@
 ## Structure
 
 All states have common features
-- Two methods `AddTransition` and `OverwriteTransition` to add transitions from this state to an other state.
+- A method `AddTransition` to add transitions from this state to an other state.
 - A method `SetDefault` to set the default transition used when no transitions are valid.
 - A method `SetAction` to set the action linked to the state.
 - Two methods `Activate` and `Deactivate` to control the state's activity.
@@ -29,12 +29,6 @@ The complete API description is available below.
 ### IState\<T\> AddTransition(ITransition\<T\> transition)
 
 Add a transition to the list of transitions. If a transition with the same token already exists, the already existing transition has priority over this one.
-
-Returns: The current state
-
-### IState\<T\> OverwriteTransition(ITransition\<T\> transition)
-
-Same as `AddTransition` but overwrites the existing transition if one with the same token already exists.
 
 ### void ClearTransitions()
 
@@ -223,9 +217,6 @@ private OnStateReached(object? sender, TransitionEventArgs<int> e) {
 
    # followed by
    state.AddTransition(new Transition(...)):
-
-   # or
-   state.OverwriteTransition(new Transition(...));
 
    # or
    state.GetTransition(...)?.SetAction(...);

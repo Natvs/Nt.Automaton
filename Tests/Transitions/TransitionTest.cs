@@ -20,6 +20,18 @@ namespace Nt.Tests.Automaton.Transitions
         }
 
         [Fact]
+        public void Transition_Accept_NoToken()
+        {
+            var token = new AutomatonToken<string>("a");
+            var target = new State<string>();
+            var transition = new Transition<string>(target);
+
+            var accepted = transition.Accepts(token);
+
+            Assert.True(accepted);
+        }
+
+        [Fact]
         public void Transition_Accept_InvalidToken()
         {
             var token = new AutomatonToken<string>("a");
@@ -32,7 +44,20 @@ namespace Nt.Tests.Automaton.Transitions
         }
 
         [Fact]
-        public void Transition_Accept_OnCondition()
+        public void Transition_Accept_NoTokenOnCondition()
+        {
+            var token = new AutomatonToken<int>(1);
+            var target = new State<int>();
+            var condition_met = false;
+            var transition = new Transition<int>(target).OnCondition(() => condition_met);
+
+            Assert.False(transition.Accepts(token));
+            condition_met = true;
+            Assert.True(transition.Accepts(token));
+        }
+
+        [Fact]
+        public void Transition_Accept_ValidTokenOnCondition()
         {
             var token = new AutomatonToken<int>(1);
             var target = new State<int>();
@@ -43,7 +68,20 @@ namespace Nt.Tests.Automaton.Transitions
             condition_met = true;
             Assert.True(transition.Accepts(token));
         }
-        
+
+        [Fact]
+        public void Transition_Accept_InvalidTokenOnCondition()
+        {
+            var token = new AutomatonToken<int>(1);
+            var target = new State<int>();
+            var condition_met = false;
+            var transition = new Transition<int>(token, target).OnCondition(() => condition_met);
+
+            Assert.False(transition.Accepts(new AutomatonToken<int>(2)));
+            condition_met = true;
+            Assert.False(transition.Accepts(new AutomatonToken<int>(2)));
+        }
+
         // Events
 
         [Fact]

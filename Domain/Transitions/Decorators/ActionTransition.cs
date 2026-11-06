@@ -7,7 +7,7 @@ namespace Nt.Automaton.Transitions.Decorators
 {
     public class ActionTransition<T>(ITransition<T> transition, ITokenAction<T> action) : IActionTransition<T>
     {
-        public IAutomatonToken<T> Token => Transition.Token;
+        public IAutomatonToken<T>? Token => Transition.Token;
         public IState<T> Target => Transition.Target;
         public ITransition<T> Transition => transition;
 
