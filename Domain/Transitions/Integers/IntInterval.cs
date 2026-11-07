@@ -1,6 +1,6 @@
 ﻿namespace Nt.Automaton.Transitions.Integers
 {
-    internal class TransitionInterval(int min, int max) : TransitionToken
+    internal class IntInterval(int min, int max) : IntToken
     {
         public int Min { get; } = min;
         public int Max { get; } = max;

@@ -1,6 +1,6 @@
 ﻿namespace Nt.Automaton.Transitions.Integers
 {
-    internal class TransitionNumber(int value) : TransitionToken
+    internal class IntNumber(int value) : IntToken
     {
         public int Value { get; } = value;
 

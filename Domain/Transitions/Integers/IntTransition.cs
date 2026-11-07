@@ -8,7 +8,7 @@ namespace Nt.Automaton.Transitions.Integers
     {
         private int? Min { get; set; }
         private int? Max { get; set; }
-        private ICollection<TransitionToken> Tokens { get; } = [];
+        private ICollection<IntToken> Tokens { get; } = [];
 
         public IntTransition(IState<int> newState) : base(newState) { }
 
@@ -42,7 +42,7 @@ namespace Nt.Automaton.Transitions.Integers
         /// <returns>The instance of transition for method chaining</returns>
         public IntTransition Include(int value)
         {
-            Tokens.Add(new TransitionNumber(value));
+            Tokens.Add(new IntNumber(value));
             return this;
         }
 
@@ -54,7 +54,7 @@ namespace Nt.Automaton.Transitions.Integers
         /// <returns>The instance of transition for method chaining</returns>
         public IntTransition Include(int min, int max)
         {
-            Tokens.Add(new TransitionInterval(min, max));
+            Tokens.Add(new IntInterval(min, max));
             return this;
         }
 
@@ -65,7 +65,10 @@ namespace Nt.Automaton.Transitions.Integers
         /// <returns>The instance of transition for method chaining</returns>
         public IntTransition Include(ICollection<int> values)
         {
-            Tokens.Add(new TransitionCollection(values));
+            foreach (var value in values)
+            {
+                Tokens.Add(new IntNumber(value));
+            }
             return this;
         }
 
