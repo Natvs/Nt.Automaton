@@ -69,7 +69,7 @@ namespace Nt.Automaton.States
             }
             return null;
         }
-        public IState<T> Read(IAutomatonToken<T> token)
+        public virtual IState<T> Read(IAutomatonToken<T> token)
         {
             foreach (var transition in Transitions)
             {
@@ -96,11 +96,11 @@ namespace Nt.Automaton.States
             return transition.Target;
         }
 
-        public void Activate() 
+        public virtual void Activate() 
         {
             Activated?.Invoke(this, new EventArgs());
-        }
-        public void Deactivate() 
+        } 
+        public virtual void Deactivate() 
         {
             Deactivated?.Invoke(this, new EventArgs());
         }

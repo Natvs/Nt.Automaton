@@ -112,11 +112,35 @@ state.Read(token);
 
 In this example the transition is always taken as long as the token read is 1, but the action is performed only if the condition is met (only half of the time here).
 
+## Types of transitions
+
+The `Transition` is a general transition that can accept any type of token.
+There are also some specific transitions that are more convenient to use for specific types of tokens. 
+These transitions inherit from the base `Transition` and add some specific methods.
+
+- `IntTransition` is a transition that accepts integer tokens and provides more convenient methods to define the range of accepted values.
+
+### Integer transitions
+
+The `IntTransition` is a specific type of transition that is designed to work with integer tokens. 
+It provides a more user-friendly way to define range, interval and collections of acceptable integer values.
+
+|Method|Description|
+|------|-----------|
+|`Include(int value)`|Adds a single integer value to the set of accepted values.|
+|`Include(int min, int max)`|Adds a range of integer values to the set of accepted values.|
+|`Include(ICollection<int> values)`|Adds a collection of integer values to the set of accepted values.|
+|`SetMin(int min)`|Sets the minimum value that is accepted.|
+|`SetMax(int max)`|Sets the maximum value that is accepted.|
+|`Accepts(int value)`|Convenient method to check if an integer value is accepted.|
+
 ## Customisable transitions
 
-In addition to the existing transitions, you can create your own transition by implementing the `ITransition` interface.
+In addition to the existing transitions, you can create your own transition by extending the `Transition` class or by implementing the `ITransition` interface.
 
-Example
+When extending the `Transition` class, you can override the `Accepts` and `Trigger` methods to customize the behavior of the transition when it is checked for acceptance or triggered.
+
+Example:
 
 ```csharp
 using Nt.Automaton.Transitions;
@@ -137,8 +161,14 @@ public class DigitTransition : Transition<int>
 
     public override bool Accepts(IAutomatonToken<int> token)
     {
-        return token.Value >= 0 && token.Value <= 9;
+        if (token.Value >= 0 && token.Value <= 9)
+        {
+            return base.Accepts(token);
+        }
+        return false;
     }
 }
-
 ```
+
+By implementing the `ITransition` interface, you have to manually implement all the methods and properties defined in the interface.
+However, this gives you a lot of flexibility to create a transition that fits your needs.

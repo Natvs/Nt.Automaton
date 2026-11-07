@@ -42,7 +42,8 @@ namespace Nt.Automaton.Transitions
             this.condition = condition;
             return this;
         }
-        public bool Accepts(IAutomatonToken<T> token)
+        
+        public virtual bool Accepts(IAutomatonToken<T> token)
         {
             if (!condition()) return false;
             if (Token == null || Token.Value == null) return true;
@@ -54,7 +55,7 @@ namespace Nt.Automaton.Transitions
             return new ActionTransition<T>(this, action);
         }
 
-        public void Trigger(IAutomatonToken<T> token) 
+        public virtual void Trigger(IAutomatonToken<T> token) 
         {
             Triggered?.Invoke(this, new TokenEventArgs<T>(token));
         }
