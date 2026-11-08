@@ -2,6 +2,7 @@
 
 - [Introduction](#introduction)
 - [Features](#features)
+- [Installation](#installation)
 - [Using an automaton](#using-an-automaton)
 	- [Creating a token](#creating-a-token)	 
 	- [Defining actions](#defining-actions)
@@ -22,11 +23,24 @@ Applications of this library include:
 - Any kind of workflow or any other state-based logic
 
 ## Features
-- Define states and transitions for an automate.
+- Easily define states and transitions for an automate.
 - Link actions to states and transitions.
 - Iterate over a list of tokens and process them according to the defined automate.
 - Easily extendable for custom behavior.
 - Lightweight and efficient.
+
+## Installation
+
+Install the NuGet package `Nt.Automaton` in your project from nuget.org:
+
+```powerShell
+dotnet add package Nt.Automaton --version 1.3.0
+```
+
+or add the following line in your project file:
+```xml
+<PackageReference Include="Nt.Automaton" Version="1.3.0" />
+```
 
 ## Using an automaton
 
