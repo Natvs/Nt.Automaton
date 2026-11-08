@@ -7,6 +7,9 @@
 - [Adding conditions to transitions](#adding-conditions-to-transitions)
     - [OnCondition after a constructor](#oncondition-after-a-constructor)
     - [OnCondition after setting an action](#oncondition-after-setting-an-action)
+- [Types of transitions](#types-of-transitions)
+    - [Integer transitions](#integer-transitions)
+    - [String transitions](#string-transitions)
 - [Customisable transitions](#customisable-transitions)
 
 ## Structure
@@ -112,11 +115,92 @@ state.Read(token);
 
 In this example the transition is always taken as long as the token read is 1, but the action is performed only if the condition is met (only half of the time here).
 
+## Types of transitions
+
+The `Transition` is a general transition that can accept any type of token.
+There are also some specific transitions that are more convenient to use for specific types of tokens. 
+These transitions inherit from the base `Transition` and add some specific methods that can also be chained together.
+
+- `IntTransition` is a transition that accepts integer tokens and provides more convenient methods to define the range of accepted values.
+
+### Integer transitions
+
+The `IntTransition` is a specific type of transition that is designed to work with integer tokens. 
+It provides a more user-friendly way to define range, interval and collections of acceptable integer values.
+
+|Method|Description|
+|------|-----------|
+|`Include(int value)`|Adds a single integer value to the set of accepted values.|
+|`Include(int min, int max)`|Adds a range of integer values to the set of accepted values.|
+|`Include(ICollection<int> values)`|Adds a collection of integer values to the set of accepted values.|
+|`SetMin(int min)`|Sets the minimum value that is accepted.|
+|`SetMax(int max)`|Sets the maximum value that is accepted.|
+|`Accepts(int value)`|Convenient method to check if an integer value is accepted.|
+
+> Note that the `SetMin` and `SetMax` methods primes on the `Include` method, so if you call `SetMin(5)` and then `Include([1, 2, 3])`, the transition will still only accept values greater than or equal than 5.
+
+Examples:
+
+```csharp
+using Nt.Automaton.Transitions.Integers;
+
+var target = new State();
+
+// Define a transition that accepts the value 1
+var transition = new IntTransition(target).Include(1);
+
+// Define a transition that accepts a collection of values
+var transition = new IntTransition(target).Include([1, 3, 5]);
+
+// Define a transition that accepts an interval of values between 1 and 10 (included)
+var transition = new IntTransition(target).Include(1, 10);
+
+// Define a transition that accepts values greater that 5 (included)
+var transition = new IntTransition(target).SetMin(5);
+
+// Define a transition that accepts values less that 5 (included)
+var transition = new IntTransition(target).SetMax(5);
+```
+
+### String transitions
+
+The `StringTransition` is a specific type of transition that is designed to work with string tokens. 
+It allows to provide a bunch of acceptable string values from a collection as well as defining patterns for acceptable strings.
+
+|Method|Description|
+|------|-----------|
+|`Include(string value)`|Adds a single string value to the set of accepted values.|
+|`Include(ICollection<string> values)`|Adds a collection of string values to the set of accepted values.|
+|`AddPattern(string pattern)`|Adds a regular expression pattern to the set of accepted values.|
+|`Accepts(string value)`|Convenient method to check if a string value is accepted.|
+
+> Note that the `AddPattern` method uses .NET Framework's regular expressions.
+> DO NOT add the `^` and `$` start and finals anchors to the pattern, as they are automatically added by `Nt.Automaton`.
+
+Examples:
+
+```csharp
+using Nt.Automaton.Transitions.Strings;
+
+var target = new State();
+
+// Define a transition that accepts the value "token"
+var transition = new StringTransition(target).Include("token");
+
+// Define a transition that accepts a collection of values
+var transition = new StringTransition(target).Include(["token1", "token2", "token3" ]);
+
+// Define a transition that accepts strings matching a pattern
+var transition = new StringTransition(target).AddPattern(@"token\d+");
+```
+
 ## Customisable transitions
 
-In addition to the existing transitions, you can create your own transition by implementing the `ITransition` interface.
+In addition to the existing transitions, you can create your own transition by extending the `Transition` class or by implementing the `ITransition` interface.
 
-Example
+When extending the `Transition` class, you can override the `Accepts` and `Trigger` methods to customize the behavior of the transition when it is checked for acceptance or triggered.
+
+Example:
 
 ```csharp
 using Nt.Automaton.Transitions;
@@ -137,8 +221,14 @@ public class DigitTransition : Transition<int>
 
     public override bool Accepts(IAutomatonToken<int> token)
     {
-        return token.Value >= 0 && token.Value <= 9;
+        if (token.Value >= 0 && token.Value <= 9)
+        {
+            return base.Accepts(token);
+        }
+        return false;
     }
 }
-
 ```
+
+By implementing the `ITransition` interface, you have to manually implement all the methods and properties defined in the interface.
+However, this gives you a lot of flexibility to create a transition that fits your needs.

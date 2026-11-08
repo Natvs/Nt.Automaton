@@ -226,7 +226,9 @@ private OnStateReached(object? sender, TransitionEventArgs<int> e) {
 
 ### Customisable states
 
-In addition to the existing states, you can override the default behavior by implementing the `Nt.Automaton.States.State` class, or create a new state from scratch by implementing the `Nt.Automaton.States.IState` interface.
+In addition to the existing states, you can extend the default behavior by implementing the `Nt.Automaton.States.State` class, or create a new state from scratch by implementing the `Nt.Automaton.States.IState` interface.
+
+When extending the `Nt.Automaton.States.State` class, you can override the `Read`, `Activate`, and `Deactivate` methods to customize the behavior of the state when it is read, activated, or deactivated.
 
 Example:
 
@@ -253,5 +255,7 @@ public class MyState<T> : State<T>
 		base.Deactivate();
 	}
 }
-
 ```
+
+When implementing the `Nt.Automaton.States.IState` interface, you have to manually implement all the methods and properties defined in the interface.
+However, this gives you a lot of flexibility to create a state that fits your needs.
