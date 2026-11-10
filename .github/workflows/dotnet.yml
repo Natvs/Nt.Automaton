@@ -119,6 +119,15 @@ jobs:
             echo "Release $TAG does not exist. A new release will be created."
           }
           exit 0
+      - name: Post comment
+        if: github.event_name == 'pull_request'
+        shell: pwsh
+        run: |
+          if (${{steps.check.outputs.create}} == 'true') {
+            gh pr comment ${{github.head_ref}} --body "Information: No release ${{steps.tag.outputs.tag}} exists. A new release will be created if the pull request is merged." 
+          } else {
+            gh pr comment ${{github.head_ref}} --body "Information: A release ${{steps.tag.outputs.tag}} already exists."
+          }
     outputs:
       tag: ${{steps.tag.outputs.tag}}
       create-release: ${{steps.check.outputs.create}}
@@ -146,6 +155,15 @@ jobs:
           } else {
             echo "create=true" >> "$env:GITHUB_OUTPUT"
             echo "Package for version $version inexistant. A new package will be created."
+          }
+      - name: Post comment
+        if: github.event_name == 'pull_request'
+        shell: pwsh
+        run: |
+          if (${{steps.check.outputs.create}} == 'true') {
+            gh pr comment ${{github.head_ref}} --body "Information: No package for version ${{steps.version.outputs.version}} exists. A new package will be published if the pull request is merged." 
+          } else {
+            gh pr comment ${{github.head_ref}} --body "Information: A package for version ${{steps.version.outputs.version}} already exists."
           }
     outputs:
       create-package: ${{steps.check.outputs.create}}
