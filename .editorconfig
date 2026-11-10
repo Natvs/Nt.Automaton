@@ -2,3 +2,6 @@
 
 # IDE0290: Utiliser le constructeur principal
 dotnet_diagnostic.IDE0290.severity = silent
+
+# CA1852 : Mark objects as sealed whenever possible
+dotnet_diagnostic.CA1852.severity = silent

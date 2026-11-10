@@ -25,13 +25,16 @@ env:
   PR_NUMBER: ${{ github.event.pull_request.number }}
 
 jobs:
+
+  # Build and Test
+
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout solution
         uses: actions/checkout@v7
       - name: Setup .NET
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 10.0.x
       - name: Restore dependencies
@@ -41,8 +44,9 @@ jobs:
       - name: Test
         run: dotnet test --no-build --verbosity normal
 
+  # Code analysis
+
   trivy-analysis:
-    name: Analyze code with Trivy
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -65,7 +69,6 @@ jobs:
           sarif_file: 'trivy-results.sarif'
 
   generate-sbom:
-    name: Generate SBOM with Trivy
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
     needs:
@@ -89,6 +92,8 @@ jobs:
         with:
           name: sbom
           path: ${{env.SBOM_PATH}}
+
+  # Release
 
   check-release:
     runs-on: ubuntu-latest
@@ -161,6 +166,41 @@ jobs:
       tag: ${{steps.tag.outputs.tag}}
       create-release: ${{steps.check.outputs.create}}
 
+  # This job requires a file release-notes.md in the root of the repository with the release notes for the new release.
+  create-release:
+    needs:
+      - build
+      - check-release
+      - generate-sbom
+    if: github.event_name == 'push' && needs.check-release.outputs.create-release == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  
+    env:
+      title: ${{needs.check-release.outputs.tag}}
+      tag: ${{needs.check-release.outputs.tag}}
+      release-file: release-notes.md
+    steps:
+      - name: Checkout solution
+        uses: actions/checkout@v7
+      - name: Download SBOM
+        uses: actions/download-artifact@v8
+        with:
+          name: sbom
+          path: ${{env.SBOM_PATH}}
+      - name: Create release
+        run: |
+          gh release create \
+            ${{env.tag}} \
+            "${{env.SBOM_PATH}}/bom.json#sbom.json" \
+            --title ${{env.title}}
+      - name: Upload release notes
+        shell: pwsh
+        run: |
+            Get-Content ${{env.release-file}} | gh release edit ${{env.tag}} --notes-file -
+
+  # Package
+
   check-nuget:
     runs-on: ubuntu-latest
     permissions:
@@ -225,39 +265,6 @@ jobs:
     outputs:
       create-package: ${{steps.check.outputs.create}}
 
-  # This job requires a file release-notes.md in the root of the repository with the release notes for the new release.
-  create-release:
-    needs:
-      - build
-      - check-release
-      - generate-sbom
-    if: github.event_name == 'push' && needs.check-release.outputs.create-release == 'true'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write  
-    env:
-      title: ${{needs.check-release.outputs.tag}}
-      tag: ${{needs.check-release.outputs.tag}}
-      release-file: release-notes.md
-    steps:
-      - name: Checkout solution
-        uses: actions/checkout@v7
-      - name: Download SBOM
-        uses: actions/download-artifact@v8
-        with:
-          name: sbom
-          path: ${{env.SBOM_PATH}}
-      - name: Create release
-        run: |
-          gh release create \
-            ${{env.tag}} \
-            "${{env.SBOM_PATH}}/bom.json#sbom.json" \
-            --title ${{env.title}}
-      - name: Upload release notes
-        shell: pwsh
-        run: |
-            Get-Content ${{env.release-file}} | gh release edit ${{env.tag}} --notes-file -
-
   pack:
     needs: 
       - build
@@ -265,15 +272,15 @@ jobs:
     if: github.event_name == 'push' && needs.check-nuget.outputs.create-package == 'true'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 10.0.x
       - name: Pack
         run: dotnet pack ${{ env.PROJECT_PATH }} --configuration Release --output ${{ env.NUGET_PATH }} --verbosity quiet
       - name: Upload artifact
-        uses: actions/upload-artifact@v7.0.1
+        uses: actions/upload-artifact@v7
         with:
           path: ${{env.NUGET_PATH}}
           name: nuget
@@ -286,9 +293,9 @@ jobs:
       packages: write
     steps:
       - name: Checkout solution
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 10.0.x
       - name: Download package
@@ -311,7 +318,6 @@ jobs:
               dotnet nuget push $_.FullName --source "github" --skip-duplicate
           }
 
-
   publish-nuget:
     needs: 
       - pack
@@ -321,9 +327,9 @@ jobs:
       contents: read
     steps:
       - name: Checkout solution
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 10.0.x
       - name: Download Nuget
