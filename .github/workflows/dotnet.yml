@@ -40,12 +40,38 @@ jobs:
       - name: Test
         run: dotnet test --no-build --verbosity normal
 
-  generate-sbom:
+  trivy-analysis:
+    name: Analyze code with Trivy
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
     permissions:
       contents: read
       security-events: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+      - name: Run Trivy vulnerability scanner in repo mode
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: 'fs'
+          ignore-unfixed: true
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'HIGH,CRITICAL'
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v4
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  generate-sbom:
+    name: Generate SBOM with Trivy
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    needs:
+      - build
+      - trivy-analysis
+    permissions:
+      contents: read
     steps:
       - name: Checkout solution
         uses: actions/checkout@v7
