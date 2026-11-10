@@ -91,6 +91,8 @@ jobs:
 
   check-release:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     steps:
       - name: Checkout solution
         uses: actions/checkout@v7 
@@ -134,6 +136,8 @@ jobs:
 
   check-nuget:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     steps:
       - uses: actions/checkout@v7
       - name: Retrieve version
