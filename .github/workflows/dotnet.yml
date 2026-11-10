@@ -150,10 +150,10 @@ jobs:
         run: |
           if (${{steps.check.outputs.create}} == 'true') {
             gh pr comment ${{env.PR_NUMBER}} --body `
-              "Information: No release ${{env.TAG}} exists. A new release will be created if the pull request is merged." 
+              "${{env.HTML_COMMENT}}Information: No release ${{env.TAG}} exists. A new release will be created if the pull request is merged." 
           } else {
             gh pr comment ${{env.PR_NUMBER}} --body `
-              "Information: A release ${{env.TAG}} already exists."
+              "${{env.HTML_COMMENT}}Information: A release ${{env.TAG}} already exists."
           }
     outputs:
       tag: ${{steps.tag.outputs.tag}}
@@ -212,9 +212,11 @@ jobs:
           VERSION: ${{steps.version.outputs.version}}
         run: |
           if (${{steps.check.outputs.create}} == 'true') {
-            gh pr comment ${{env.PR_NUMBER}} --body "Information: No package for version ${{env.VERSION}} exists. A new package will be published if the pull request is merged." 
+            gh pr comment ${{env.PR_NUMBER}} --body `
+            "${{env.HTML_COMMENT}}Information: No package for version ${{env.VERSION}} exists. A new package will be published if the pull request is merged." 
           } else {
-            gh pr comment ${{env.PR_NUMBER}} --body "Information: A package for version ${{env.VERSION}} already exists."
+            gh pr comment ${{env.PR_NUMBER}} --body `
+            "${{env.HTML_COMMENT}}Information: A package for version ${{env.VERSION}} already exists."
           }
     outputs:
       create-package: ${{steps.check.outputs.create}}
