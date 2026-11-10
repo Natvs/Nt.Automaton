@@ -125,6 +125,7 @@ jobs:
           }
           exit 0
       - name: Delete previous comment
+        if: github.event_name == 'pull_request'
         shell: pwsh
         run: |
           $comments = gh api `
@@ -189,6 +190,7 @@ jobs:
             echo "Package for version $version inexistant. A new package will be created."
           }
       - name: Delete previous comment
+        if: github.event_name == 'pull_request'
         shell: pwsh
         run: |
           $comments = gh api `
