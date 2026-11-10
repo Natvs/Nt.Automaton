@@ -4,6 +4,8 @@ on:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
+permissions:
+  contents: read
 
 env:
   # Project settings
@@ -37,26 +39,26 @@ jobs:
         run: dotnet build --no-restore
       - name: Test
         run: dotnet test --no-build --verbosity normal
-    
+
   generate-sbom:
     runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    permissions:
+      contents: read
+      security-events: write
     steps:
       - name: Checkout solution
         uses: actions/checkout@v7
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v5
+      - name: Generate SBOM with trivy
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
-          dotnet-version: 10.0.x
-      - name: Restore dependencies
-        run: dotnet restore "${{ env.PROJECT_PATH }}/${{ env.PROJECT_FILE }}"
-      - name: Generate SBOM
-        uses: CycloneDX/gh-dotnet-generate-sbom@v1.0.1
-        with:
-          path: ${{env.PROJECT_PATH}}/${{env.PROJECT_FILE}}
-          out: ${{env.SBOM_PATH}}
-          json: true
-      - name: Upload artifact
-        uses: actions/upload-artifact@v7.0.1
+          scan-type: 'fs'
+          format: 'github'
+          output: ${{env.SBOM_PATH}}
+          scan-ref: '${{env.PROJECT_PATH}}'
+          github-pat: ${{github.token}}
+      - name: Upload trivy report as a Github artifact
+        uses: actions/upload-artifact@v7
         with:
           name: sbom
           path: ${{env.SBOM_PATH}}
