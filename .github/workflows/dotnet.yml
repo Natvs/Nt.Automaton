@@ -22,6 +22,7 @@ env:
   # API
   API_PACKAGE_PATH: /users/natvs/packages/nuget/Nt.Automaton/versions            
   GH_TOKEN: ${{github.token}}
+  PR_NUMBER: ${{ github.event.pull_request.number }}
 
 jobs:
   build:
@@ -93,6 +94,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
+    env:
+      HTML_COMMENT: "<--! ci:release -->"
     steps:
       - name: Checkout solution
         uses: actions/checkout@v7 
@@ -121,14 +124,36 @@ jobs:
             echo "Release $TAG does not exist. A new release will be created."
           }
           exit 0
+      - name: Delete previous comment
+        shell: pwsh
+        run: |
+          $comments = gh api `
+              "repos/${{github.repository}}/issues/${{env.PR_NUMBER}}/comments" `
+              --paginate | ConvertFrom-Json
+          $comment = $comments |
+              Where-Object { $_.body -like '*${{env.HTML_COMMENT}}*' } |
+              Select-Object -Last 1    
+          if ($null -ne $comment) {
+              gh api `
+                  "repos/${{github.repository}}/issues/comments/$comment.id" `
+                  -X DELETE   
+              Write-Host "Previous comment deleted."
+          }
+          else {
+              Write-Host "No previous comment found."
+          }
       - name: Post comment
         if: github.event_name == 'pull_request'
         shell: pwsh
+        env:
+          TAG: ${{steps.tag.outputs.tag}}
         run: |
           if (${{steps.check.outputs.create}} == 'true') {
-            gh pr comment ${{github.head_ref}} --body "Information: No release ${{steps.tag.outputs.tag}} exists. A new release will be created if the pull request is merged." 
+            gh pr comment ${{env.PR_NUMBER}} --body `
+              "Information: No release ${{env.TAG}} exists. A new release will be created if the pull request is merged." 
           } else {
-            gh pr comment ${{github.head_ref}} --body "Information: A release ${{steps.tag.outputs.tag}} already exists."
+            gh pr comment ${{env.PR_NUMBER}} --body `
+              "Information: A release ${{env.TAG}} already exists."
           }
     outputs:
       tag: ${{steps.tag.outputs.tag}}
@@ -138,6 +163,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
+    env:
+      HTML_COMMENT: "<--! ci:package -->"
     steps:
       - uses: actions/checkout@v7
       - name: Retrieve version
@@ -160,14 +187,34 @@ jobs:
             echo "create=true" >> "$env:GITHUB_OUTPUT"
             echo "Package for version $version inexistant. A new package will be created."
           }
+      - name: Delete previous comment
+        shell: pwsh
+        run: |
+          $comments = gh api `
+              "repos/${{github.repository}}/issues/${{env.PR_NUMBER}}/comments" `
+              --paginate | ConvertFrom-Json
+          $comment = $comments |
+              Where-Object { $_.body -like '*${{env.HTML_COMMENT}}*' } |
+              Select-Object -Last 1    
+          if ($null -ne $comment) {
+              gh api `
+                  "repos/${{github.repository}}/issues/comments/$comment.id" `
+                  -X DELETE   
+              Write-Host "Previous comment deleted."
+          }
+          else {
+              Write-Host "No previous comment found."
+          }
       - name: Post comment
         if: github.event_name == 'pull_request'
         shell: pwsh
+        env:
+          VERSION: ${{steps.version.outputs.version}}
         run: |
           if (${{steps.check.outputs.create}} == 'true') {
-            gh pr comment ${{github.head_ref}} --body "Information: No package for version ${{steps.version.outputs.version}} exists. A new package will be published if the pull request is merged." 
+            gh pr comment ${{env.PR_NUMBER}} --body "Information: No package for version ${{env.VERSION}} exists. A new package will be published if the pull request is merged." 
           } else {
-            gh pr comment ${{github.head_ref}} --body "Information: A package for version ${{steps.version.outputs.version}} already exists."
+            gh pr comment ${{env.PR_NUMBER}} --body "Information: A package for version ${{env.VERSION}} already exists."
           }
     outputs:
       create-package: ${{steps.check.outputs.create}}
