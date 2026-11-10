@@ -4,6 +4,8 @@ on:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
+permissions:
+  contents: read
 
 env:
   # Project settings
@@ -20,6 +22,7 @@ env:
   # API
   API_PACKAGE_PATH: /users/natvs/packages/nuget/Nt.Automaton/versions            
   GH_TOKEN: ${{github.token}}
+  PR_NUMBER: ${{ github.event.pull_request.number }}
 
 jobs:
   build:
@@ -37,32 +40,62 @@ jobs:
         run: dotnet build --no-restore
       - name: Test
         run: dotnet test --no-build --verbosity normal
-    
-  generate-sbom:
+
+  trivy-analysis:
+    name: Analyze code with Trivy
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+      - name: Run Trivy vulnerability scanner in repo mode
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: 'fs'
+          ignore-unfixed: true
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'HIGH,CRITICAL'
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v4
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  generate-sbom:
+    name: Generate SBOM with Trivy
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    needs:
+      - build
+      - trivy-analysis
+    permissions:
+      contents: read
     steps:
       - name: Checkout solution
         uses: actions/checkout@v7
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v5
+      - name: Generate SBOM with trivy
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
-          dotnet-version: 10.0.x
-      - name: Restore dependencies
-        run: dotnet restore "${{ env.PROJECT_PATH }}/${{ env.PROJECT_FILE }}"
-      - name: Generate SBOM
-        uses: CycloneDX/gh-dotnet-generate-sbom@v1.0.1
-        with:
-          path: ${{env.PROJECT_PATH}}/${{env.PROJECT_FILE}}
-          out: ${{env.SBOM_PATH}}
-          json: true
-      - name: Upload artifact
-        uses: actions/upload-artifact@v7.0.1
+          scan-type: 'fs'
+          format: 'github'
+          output: ${{env.SBOM_PATH}}
+          scan-ref: '${{env.PROJECT_PATH}}'
+          github-pat: ${{github.token}}
+      - name: Upload trivy report as a Github artifact
+        uses: actions/upload-artifact@v7
         with:
           name: sbom
           path: ${{env.SBOM_PATH}}
 
   check-release:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    env:
+      HTML_COMMENT: "<!-- ci:release -->"
     steps:
       - name: Checkout solution
         uses: actions/checkout@v7 
@@ -91,12 +124,48 @@ jobs:
             echo "Release $TAG does not exist. A new release will be created."
           }
           exit 0
+      - name: Delete previous comment
+        shell: pwsh
+        run: |
+          $comments = gh api `
+              "repos/${{github.repository}}/issues/${{env.PR_NUMBER}}/comments" `
+              --paginate | ConvertFrom-Json
+          $comment = $comments |
+              Where-Object { $_.body -like '*${{env.HTML_COMMENT}}*' } |
+              Select-Object -Last 1    
+          if ($null -ne $comment) {
+              $id = $comment.id
+              gh api `
+                  --method DELETE `
+                  "repos/${{github.repository}}/issues/comments/$id"
+              Write-Host "Previous comment deleted."
+          }
+          else {
+              Write-Host "No previous comment found."
+          }
+      - name: Post comment
+        if: github.event_name == 'pull_request'
+        shell: pwsh
+        env:
+          TAG: ${{steps.tag.outputs.tag}}
+        run: |
+          if (${{steps.check.outputs.create}} == 'true') {
+            gh pr comment ${{env.PR_NUMBER}} --body `
+              "${{env.HTML_COMMENT}}Information: No release ${{env.TAG}} exists. A new release will be created if the pull request is merged." 
+          } else {
+            gh pr comment ${{env.PR_NUMBER}} --body `
+              "${{env.HTML_COMMENT}}Information: A release ${{env.TAG}} already exists."
+          }
     outputs:
       tag: ${{steps.tag.outputs.tag}}
       create-release: ${{steps.check.outputs.create}}
 
   check-nuget:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    env:
+      HTML_COMMENT: "<!-- ci:package -->"
     steps:
       - uses: actions/checkout@v7
       - name: Retrieve version
@@ -118,6 +187,38 @@ jobs:
           } else {
             echo "create=true" >> "$env:GITHUB_OUTPUT"
             echo "Package for version $version inexistant. A new package will be created."
+          }
+      - name: Delete previous comment
+        shell: pwsh
+        run: |
+          $comments = gh api `
+              "repos/${{github.repository}}/issues/${{env.PR_NUMBER}}/comments" `
+              --paginate | ConvertFrom-Json
+          $comment = $comments |
+              Where-Object { $_.body -like '*${{env.HTML_COMMENT}}*' } |
+              Select-Object -Last 1    
+          if ($null -ne $comment) {
+              $id = $comment.id
+              gh api `
+                  --method DELETE `
+                  "repos/${{github.repository}}/issues/comments/$id" 
+              Write-Host "Previous comment deleted."
+          }
+          else {
+              Write-Host "No previous comment found."
+          }
+      - name: Post comment
+        if: github.event_name == 'pull_request'
+        shell: pwsh
+        env:
+          VERSION: ${{steps.version.outputs.version}}
+        run: |
+          if (${{steps.check.outputs.create}} == 'true') {
+            gh pr comment ${{env.PR_NUMBER}} --body `
+            "${{env.HTML_COMMENT}}Information: No package for version ${{env.VERSION}} exists. A new package will be published if the pull request is merged." 
+          } else {
+            gh pr comment ${{env.PR_NUMBER}} --body `
+            "${{env.HTML_COMMENT}}Information: A package for version ${{env.VERSION}} already exists."
           }
     outputs:
       create-package: ${{steps.check.outputs.create}}
