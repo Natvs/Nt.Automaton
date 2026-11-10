@@ -95,7 +95,7 @@ jobs:
     permissions:
       pull-requests: write
     env:
-      HTML_COMMENT: "<--! ci:release -->"
+      HTML_COMMENT: "<!-- ci:release -->"
     steps:
       - name: Checkout solution
         uses: actions/checkout@v7 
@@ -164,7 +164,7 @@ jobs:
     permissions:
       pull-requests: write
     env:
-      HTML_COMMENT: "<--! ci:package -->"
+      HTML_COMMENT: "<!-- ci:package -->"
     steps:
       - uses: actions/checkout@v7
       - name: Retrieve version
