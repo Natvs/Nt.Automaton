@@ -22,7 +22,7 @@ env:
   # API
   API_PACKAGE_PATH: /users/natvs/packages/nuget/Nt.Automaton/versions            
   GH_TOKEN: ${{github.token}}
-  PR_NUMBER: ${{ github.event.pull_request.number }}
+  PR_NUMBER: ${{github.event.pull_request.number}}
 
 jobs:
 
@@ -106,26 +106,28 @@ jobs:
         uses: actions/checkout@v7 
       - name: Retrieve version
         id: version
+        shell: pwsh
         run: |
-          cd ${{env.PROJECT_PATH}}  
-          VERSION=$(dotnet msbuild ${{env.PROJECT_FILE}} -getProperty:Version)
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          cd ${{env.PROJECT_PATH}}
+          $VERSION=$(dotnet msbuild ${{env.PROJECT_FILE}} -getProperty:Version)
+          echo "version=$VERSION" >> "$Env:GITHUB_OUTPUT"
           echo "Project version: $VERSION"
       - name: Create tag
         id: tag
+        shell: pwsh
         run: |
-          TAG="v${{steps.version.outputs.version}}"
-          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          $TAG="v${{steps.version.outputs.version}}"
+          echo "tag=$TAG" >> "$Env:GITHUB_OUTPUT"
       - name: Check release
         id: check
         shell: pwsh
         run: |
           $TAG = "${{steps.tag.outputs.tag}}"
           if (gh release view "$TAG") {     
-            echo "create=false" >> "$env:GITHUB_OUTPUT"
+            echo "create=false" >> "$Env:GITHUB_OUTPUT"
             echo "Release $TAG already exists. No release will be created."
           } else {     
-            echo "create=true" >> "$env:GITHUB_OUTPUT"
+            echo "create=true" >> "$Env:GITHUB_OUTPUT"
             echo "Release $TAG does not exist. A new release will be created."
           }
           exit 0
@@ -154,17 +156,17 @@ jobs:
         shell: pwsh
         env:
           TAG: ${{steps.tag.outputs.tag}}
+          CREATE: ${{steps.check.outputs.create}}
         run: |
-          if (${{steps.check.outputs.create}} == 'true') {
-            gh pr comment ${{env.PR_NUMBER}} --body `
-              "${{env.HTML_COMMENT}}Information: No release ${{env.TAG}} exists. A new release will be created if the pull request is merged." 
+          if ("${{env.CREATE}}" -eq $true) {
+            $message = "Information: No release ${{env.TAG}} exists. A new release will be created if the pull request is merged."
           } else {
-            gh pr comment ${{env.PR_NUMBER}} --body `
-              "${{env.HTML_COMMENT}}Information: A release ${{env.TAG}} already exists."
+            $message = "Information: A release ${{env.TAG}} already exists."
           }
+          gh pr comment ${{env.PR_NUMBER}} --body "${{env.HTML_COMMENT}}$message"
     outputs:
       tag: ${{steps.tag.outputs.tag}}
-      create-release: ${{steps.check.outputs.create}}
+      create: ${{steps.check.outputs.create}}
 
   # This job requires a file release-notes.md in the root of the repository with the release notes for the new release.
   create-release:
@@ -172,7 +174,7 @@ jobs:
       - build
       - check-release
       - generate-sbom
-    if: github.event_name == 'push' && needs.check-release.outputs.create-release == 'true'
+    if: github.event_name == 'push' && needs.check-release.outputs.create == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write  
@@ -209,25 +211,37 @@ jobs:
       HTML_COMMENT: "<!-- ci:package -->"
     steps:
       - uses: actions/checkout@v7
-      - name: Retrieve version
+      - name: Retrieve version and package policy
         id: version
+        shell: pwsh
         run: |
           cd ${{env.PROJECT_PATH}}  
-          VERSION=$(dotnet msbuild ${{env.PROJECT_FILE}} -getProperty:PackageVersion)
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          $VERSION=$(dotnet msbuild ${{env.PROJECT_FILE}} -getProperty:PackageVersion)
+          $LOCALONLY=$(dotnet msbuild ${{env.PROJECT_FILE}} -getProperty:PackageLocalOnly)
+          echo "version=$VERSION" >> "$Env:GITHUB_OUTPUT"
+          echo "localonly=$LOCALONLY" >> "$Env:GITHUB_OUTPUT"
           echo "Package version: $VERSION"
+          echo "Package local only: $LOCALONLY"
       - name: Check package
         id: check
         shell: pwsh
+        env:
+          VERSION: ${{steps.version.outputs.version}}
+          LOCALONLY: ${{steps.version.outputs.localonly}}
         run: |
           $obj = gh api ${{env.API_PACKAGE_PATH}} | ConvertFrom-Json
-          $version = "${{steps.version.outputs.version}}"
-          if ($obj.name | Select-String $version) {
-            echo "create=false" >> "$env:GITHUB_OUTPUT"
-            echo "Package for version $version already exists. No additional to create." 
-          } else {
-            echo "create=true" >> "$env:GITHUB_OUTPUT"
-            echo "Package for version $version inexistant. A new package will be created."
+          if ($obj.name | Select-String ${{env.VERSION}}) {
+            echo "publish=false" >> "$Env:GITHUB_OUTPUT"
+            echo "Package for version ${{env.VERSION}} already exists. No additional package to publish." 
+          } 
+          else {
+            echo "publish=true" >> "$Env:GITHUB_OUTPUT"
+            if (${{env.LOCALONLY}} -eq $true) {
+              echo "Package for version ${{env.VERSION}} inexistant. The package is marked as local only and will be published locally."
+            }
+            else {
+              echo "Package for version ${{env.VERSION}} inexistant. A new package will be published."
+            }
           }
       - name: Delete previous comment
         if: github.event_name == 'pull_request'
@@ -254,22 +268,28 @@ jobs:
         shell: pwsh
         env:
           VERSION: ${{steps.version.outputs.version}}
+          PUBLISH: ${{steps.check.outputs.publish}}
+          LOCAL_ONLY: ${{steps.version.outputs.localonly}}
         run: |
-          if (${{steps.check.outputs.create}} == 'true') {
-            gh pr comment ${{env.PR_NUMBER}} --body `
-            "${{env.HTML_COMMENT}}Information: No package for version ${{env.VERSION}} exists. A new package will be published if the pull request is merged." 
+          if ("${{env.PUBLISH}}" -eq $true) {
+            if ("${{env.LOCAL_ONLY}}" -eq $true) {
+              $message = "Information: No package for version ${{env.VERSION}} exists but the package is marked as local only. A new package will be published locally if the pull request is merged."
+            } else {
+              $message = "Information: No package for version ${{env.VERSION}} exists. A new package will be published if the pull request is merged."
+            }
           } else {
-            gh pr comment ${{env.PR_NUMBER}} --body `
-            "${{env.HTML_COMMENT}}Information: A package for version ${{env.VERSION}} already exists."
+            $message = "Information: A package for version ${{env.VERSION}} already exists."
           }
+          gh pr comment ${{env.PR_NUMBER}} --body "${{env.HTML_COMMENT}}$message"
     outputs:
-      create-package: ${{steps.check.outputs.create}}
+      publish: ${{steps.check.outputs.publish}}
+      local-only: ${{steps.version.outputs.localonly}}
 
   pack:
     needs: 
       - build
       - check-nuget
-    if: github.event_name == 'push' && needs.check-nuget.outputs.create-package == 'true'
+    if: github.event_name == 'push' && needs.check-nuget.outputs.publish == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -287,6 +307,7 @@ jobs:
 
   publish-local-nuget:
     needs: 
+      - check-nuget
       - pack
     runs-on: ubuntu-latest
     permissions:
@@ -315,13 +336,15 @@ jobs:
         shell: pwsh
         run: |
           Get-ChildItem -Path "${{ env.NUGET_PATH }}" -Filter "*.nupkg" | ForEach-Object {
-              dotnet nuget push $_.FullName --source "github" --skip-duplicate
+              dotnet nuget push $_.FullName --source "github"
           }
 
   publish-nuget:
     needs: 
+      - check-nuget
       - pack
     runs-on: ubuntu-latest
+    if: needs.check-nuget.outputs.local-only == 'false'
     permissions:
       id-token: write
       contents: read

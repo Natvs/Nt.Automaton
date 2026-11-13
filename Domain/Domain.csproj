@@ -7,6 +7,7 @@
 		
 		<Title>Nt.Automaton</Title>
 		<AssemblyName>Nt.Automaton</AssemblyName>
+		<Authors>Natvs</Authors>
 		<RootNamespace>Nt.Automaton</RootNamespace>
 		<Description>Utility library for automaton operations</Description>
 		<Version>1.3.0</Version>
@@ -15,7 +16,8 @@
 		<RepositoryType>git</RepositoryType>
 
 		<PackageId>Nt.Automaton</PackageId>
-		<PackageVersion>1.3.0</PackageVersion>
+		<PackageVersion>1.3.0.1</PackageVersion>
+		<PackageLocalOnly>true</PackageLocalOnly>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageTags>automate ; automaton ; states</PackageTags>
 		<PackageReleaseNotes>$([System.IO.File]::ReadAllText('$([MSBuild]::GetPathOfFileAbove(release-notes.md))'))</PackageReleaseNotes>
@@ -24,19 +26,19 @@
 		<AnalysisMode>Recommended</AnalysisMode>
 		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
 	</PropertyGroup>
-
-  <ItemGroup>
-    <None Include="..\README.md">
-	  <Visible>false</Visible>
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-	<None Include="..\Doc\**">
-	  <Visible>false</Visible>
-	  <Link>Doc\%(RecursiveDir)%(Filename)%(Extension)</Link>
-	  <Pack>True</Pack>
-	  <PackagePath>\Doc\</PackagePath>
-	</None>
-  </ItemGroup>
+	
+	<ItemGroup>
+		<None Include="..\README.md">
+			<Visible>false</Visible>
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+		<None Include="..\Doc\**">
+			<Visible>false</Visible>
+			<Link>Doc\%(RecursiveDir)%(Filename)%(Extension)</Link>
+			<Pack>True</Pack>
+			<PackagePath>\Doc\</PackagePath>
+		</None>
+	</ItemGroup>
 
 </Project>
