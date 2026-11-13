@@ -10,17 +10,17 @@
 		<Authors>Natvs</Authors>
 		<RootNamespace>Nt.Automaton</RootNamespace>
 		<Description>Utility library for automaton operations</Description>
-		<Version>1.3.0</Version>
+		<Version>1.3.1</Version>
 	  
 		<RepositoryUrl>https://github.com/Natvs/Nt.Automaton</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 
 		<PackageId>Nt.Automaton</PackageId>
-		<PackageVersion>1.3.0.1</PackageVersion>
-		<PackageLocalOnly>true</PackageLocalOnly>
+		<PackageVersion>1.3.1</PackageVersion>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageTags>automate ; automaton ; states</PackageTags>
 		<PackageReleaseNotes>$([System.IO.File]::ReadAllText('$([MSBuild]::GetPathOfFileAbove(release-notes.md))'))</PackageReleaseNotes>
+		<PackageLocalOnly>false</PackageLocalOnly>
 
 		<AnalysisLevel>latest</AnalysisLevel>
 		<AnalysisMode>Recommended</AnalysisMode>

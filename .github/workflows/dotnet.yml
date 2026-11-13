@@ -191,11 +191,10 @@ jobs:
           name: sbom
           path: ${{env.SBOM_PATH}}
       - name: Create release
+        shell: pwsh
         run: |
-          gh release create \
-            ${{env.tag}} \
-            "${{env.SBOM_PATH}}/bom.json#sbom.json" \
-            --title ${{env.title}}
+          $bom = Get-ChildItem "${{env.SBOM_PATH}}" | Select-Object -First 1
+          gh release create ${{env.tag}} "$bom#sbom.json" --title ${{env.title}}
       - name: Upload release notes
         shell: pwsh
         run: |
@@ -236,7 +235,7 @@ jobs:
           } 
           else {
             echo "publish=true" >> "$Env:GITHUB_OUTPUT"
-            if (${{env.LOCALONLY}} -eq $true) {
+            if ("${{env.LOCALONLY}}" -eq $true) {
               echo "Package for version ${{env.VERSION}} inexistant. The package is marked as local only and will be published locally."
             }
             else {
